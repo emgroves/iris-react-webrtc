@@ -69,13 +69,13 @@ The above code also shows how you would display LocalVideo and RemoteVideo as we
 ## Notifications
 This is the list of available events and their constants that can be passed to addWebRTCListener to start listening for them.
 
-onLocalAudio - WEB_RTC_ON_LOCAL_AUDIO
-onLocalVideo - WEB_RTC_ON_LOCAL_VIDEO
-onSessionCreated - WEB_RTC_ON_SESSION_CREATED
-onRemoteParticipantJoined - WEB_RTC_ON_REMOTE_PARTICIPANT_JOINED
-onSessionConnected - WEB_RTC_ON_SESSION_CONNECTED
-onRemoteVideo - WEB_RTC_ON_REMOTE_VIDEO
-onRemoteParticipantLeft - WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT
-onSessionEnded - WEB_RTC_ON_SESSION_ENDED
-onConnectionError - WEB_RTC_ON_CONNECTION_ERROR
-onNotificationReceived - WEB_RTC_ON_NOTIFICATION_RECEIVED
+* onLocalAudio - WEB_RTC_ON_LOCAL_AUDIO
+* onLocalVideo - WEB_RTC_ON_LOCAL_VIDEO
+* onSessionCreated - WEB_RTC_ON_SESSION_CREATED
+* onRemoteParticipantJoined - WEB_RTC_ON_REMOTE_PARTICIPANT_JOINED
+* onSessionConnected - WEB_RTC_ON_SESSION_CONNECTED
+* onRemoteVideo - WEB_RTC_ON_REMOTE_VIDEO
+* onRemoteParticipantLeft - WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT
+* onSessionEnded - WEB_RTC_ON_SESSION_ENDED
+* onConnectionError - WEB_RTC_ON_CONNECTION_ERROR
+* onNotificationReceived - WEB_RTC_ON_NOTIFICATION_RECEIVED
