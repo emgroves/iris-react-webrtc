@@ -1,0 +1,13 @@
+exports[`LocalVideo renders correctly 1`] = `
+<div>
+  <video
+    autoPlay="1"
+    id="localVideo0"
+    src="https://xrtc.iris.me/video0" />
+  <audio
+    autoPlay="1"
+    id="localAudio1"
+    muted="true"
+    src="https://xrtc.iris.me/audio1" />
+</div>
+`;
