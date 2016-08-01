@@ -3,16 +3,16 @@ import {join} from 'path'
 const include = join(__dirname, 'src')
 
 export default {
-  entry: './src/index',
+  entry: './src/index.jsx',
   output: {
     path: join(__dirname, 'dist'),
     libraryTarget: 'umd',
-    library: 'irisAuth',
+    library: 'iris-react-webrtc',
   },
   devtool: 'source-map',
   module: {
     loaders: [
-      {test: /\.js$/, loader: 'babel', include},
+      {test: /(\.jsx|\.js)$/, loader: 'babel', include},
       {test: /\.json$/, 'loader': 'json', include},
     ]
   }

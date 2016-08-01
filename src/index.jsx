@@ -44,14 +44,10 @@ export let LocalVideo = class LocalVideo extends React.Component {
   }
 
   render() {
-    return (
-      <div className="box">
-        <div className="boxInner">
-          {this.props.video ? <video autoPlay="1" id={'localVideo' + this.props.video.index} src={this.props.video.src} /> : null}
-          {this.props.audio ? <audio autoPlay="1" muted="true" id={'localAudio' + this.props.audio.index} src={this.props.audio.src} /> : null}
-        </div>
-      </div>
-    );
+    return <div>
+      {this.props.video ? <video autoPlay="1" id={'localVideo' + this.props.video.index} src={this.props.video.src} /> : null}
+      {this.props.audio ? <audio autoPlay="1" muted="true" id={'localAudio' + this.props.audio.index} src={this.props.audio.src} /> : null}
+    </div>
   }
 }
 
@@ -61,14 +57,10 @@ export let RemoteVideo = class RemoteVideo extends React.Component {
   }
 
   render() {
-    return (
-      <div className="box">
-        <div className="boxInner">
-          {this.props.video ? <video autoPlay="1" id={this.props.video.index} src={this.props.video.src} /> : null}
-          {this.props.audio ? <audio autoPlay="1" id={this.props.audio.index} src={this.props.audio.src} /> : null}
-        </div>
-      </div>
-    );
+    return <div>
+      {this.props.video ? <video autoPlay="1" id={this.props.video.index} src={this.props.video.src} /> : null}
+      {this.props.audio ? <audio autoPlay="1" id={this.props.audio.index} src={this.props.audio.src} /> : null}
+    </div>
   }
 }
 
