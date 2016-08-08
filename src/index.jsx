@@ -16,6 +16,7 @@ export const WebRTCConstants = KeyMirror({
   WEB_RTC_ON_NOTIFICATION_RECEIVED: null,
   WEB_RTC_ON_AUDIO_MUTE: null,
   WEB_RTC_ON_VIDEO_MUTE: null,
+  WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED: null,
 });
 
 export let WebRTCEvents = class WebRTCEvents extends EventEmitter {
@@ -23,8 +24,8 @@ export let WebRTCEvents = class WebRTCEvents extends EventEmitter {
     super(props);
   }
 
-  emitWebRTCEvent(eventType) {
-    this.emit(eventType);
+  emitWebRTCEvent(eventType, event) {
+    this.emit(eventType, event);
   }
 
   addWebRTCListener(eventType, callback) {
@@ -127,7 +128,13 @@ export default (ComposedComponent) => {
         xrtcSDK.onSessionEnded = this._onSessionEnded.bind(this);
         xrtcSDK.onConnectionError = this._onConnectionError.bind(this);
         xrtcSDK.onNotificationReceived = this._onNotificationReceived.bind(this);
+        xrtcSDK.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
       }
+    }
+
+    _onDominantSpeakerChanged(dominantSpeakerEndpoint) {
+      console.log('onDominantSpeakerChanged' + dominantSpeakerEndpoint);
+      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED, dominantSpeakerEndpoint);
     }
 
     _sessionEnd() {
@@ -179,7 +186,10 @@ export default (ComposedComponent) => {
       this.setState({
         localConnectionList: localConnectionList,
       }, () => {
-        this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO);
+        this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, {
+          sessionId,
+          track,
+        });
       });
     }
 
@@ -249,7 +259,10 @@ export default (ComposedComponent) => {
       this.setState({
         remoteConnectionList: remoteConnectionList,
       }, () => {
-        this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO);
+        this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, {
+          sessionId,
+          track,
+        });
       });
     }
 
