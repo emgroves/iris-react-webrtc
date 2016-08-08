@@ -95,6 +95,7 @@ export default (ComposedComponent) => {
         useEventManager: true,
         callType: "videocall",
         loginType: "connect",
+        eventManager: "https://st-evmgr-cmce-002.poc.sys.comcast.net"
       }
       let serverConfig = userConfig;
       console.log("init SDK");
