@@ -188,7 +188,7 @@ export default (ComposedComponent) => {
       }, () => {
         this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, {
           sessionId,
-          track,
+          tracks,
         });
       });
     }
