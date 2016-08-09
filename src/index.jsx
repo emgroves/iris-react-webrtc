@@ -87,9 +87,9 @@ export default (ComposedComponent) => {
     _initializeWebRTC(userName, roomName, domain, token) {
       console.log('CHECK: ' + userName);
       let userConfig = {
-        jid: userName + domain,
+        jid: userName,
         password: '',
-        roomName: roomName + domain,
+        roomName: roomName,
         domain: domain,
         token: token,
         traceId: "5993E6CC-6D6D-4C9B-BC48-C0B1F29FC234",
