@@ -195,7 +195,10 @@ export default (ComposedComponent) => {
 
     _onSessionCreated(sessionId, roomName) {
       console.log('onSessionCreated - session created with ' + sessionId + ' and user joined in ' + roomName);
-      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_SESSION_CREATED);
+      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_SESSION_CREATED, {
+        sessionId,
+        roomName,
+      });
     }
 
     _onRemoteParticipantJoined() {
@@ -292,17 +295,17 @@ export default (ComposedComponent) => {
         });
       }
 
-      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT);
+      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, id);
     }
 
     _onSessionEnded(sessionId) {
       console.log('onSessionEnded: ' + sessionId);
-      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_SESSION_ENDED);
+      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_SESSION_ENDED, sessionId);
     }
 
     _onConnectionError(sessionId) {
       console.log('onConnectionError: ' + sessionId);
-      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_CONNECTION_ERROR);
+      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_CONNECTION_ERROR, sessionId);
     }
 
     _onNotificationReceived() {
