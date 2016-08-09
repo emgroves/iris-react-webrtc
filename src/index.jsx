@@ -259,10 +259,13 @@ export default (ComposedComponent) => {
       this.setState({
         remoteConnectionList: remoteConnectionList,
       }, () => {
-        this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, {
-          sessionId,
-          track,
-        });
+        if (videoConnection && audioConnection) {
+          // notify only when both video and audio is available
+          this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, {
+            sessionId,
+            track,
+          });
+        }
       });
     }
 
