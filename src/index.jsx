@@ -86,12 +86,14 @@ export default (ComposedComponent) => {
 
     _initializeWebRTC(userName, roomName, domain, token) {
       console.log('CHECK: ' + userName);
+      const routingId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);});
       let userConfig = {
         jid: userName,
         password: '',
         roomName: roomName,
         domain: domain,
         token: token,
+        routingId: routingId,
         traceId: "5993E6CC-6D6D-4C9B-BC48-C0B1F29FC234",
         useEventManager: true,
         callType: "videocall",
@@ -100,6 +102,7 @@ export default (ComposedComponent) => {
       }
       let serverConfig = userConfig;
       console.log("init SDK");
+      console.log(userConfig);
       let xrtcSDK = new window.xrtcSDK(serverConfig);
       this.setState({
         xrtcSDK: xrtcSDK,
@@ -109,12 +112,6 @@ export default (ComposedComponent) => {
       console.log(userConfig);
 
       xrtcSDK.createReceiver(userConfig.jid);
-      xrtcSDK.create(userConfig, (result) => {
-        if (result) {
-          console.log(result);
-        }
-        console.log("SDK create complete");
-      });
       xrtcSDK.createSession([], userConfig, this._onWebRTCConnect);
 
       if (xrtcSDK != null) {
