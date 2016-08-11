@@ -84,9 +84,13 @@ export default (ComposedComponent) => {
       this.eventEmitter = new WebRTCEvents();
     }
 
-    _initializeWebRTC(userName, roomName, domain, token) {
-      console.log('CHECK: ' + userName);
-      const routingId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);});
+    _initializeWebRTC(userName, routingId, roomName, domain, eventManagerUrl, token) {
+      console.log('initializeWebRTC -> userName ' + userName);
+      console.log('initializeWebRTC -> routingId ' + routingId);
+      console.log('initializeWebRTC -> roomName ' + roomName);
+      console.log('initializeWebRTC -> domain ' + domain);
+
+      const traceId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);});
       let userConfig = {
         jid: userName,
         password: '',
@@ -94,11 +98,11 @@ export default (ComposedComponent) => {
         domain: domain,
         token: token,
         routingId: routingId,
-        traceId: "5993E6CC-6D6D-4C9B-BC48-C0B1F29FC234",
+        traceId: traceId,
         useEventManager: true,
         callType: "videocall",
         loginType: "connect",
-        eventManager: "https://st-evmgr-cmce-002.poc.sys.comcast.net"
+        eventManager: eventManagerUrl
       }
       let serverConfig = userConfig;
       console.log("init SDK");
