@@ -44,10 +44,15 @@ export let LocalVideo = class LocalVideo extends React.Component {
     console.log(this.props);
   }
 
+  componentDidUpdate() {
+    this.props.video.track.attach($(this.refs.localVideo)[0]);
+    this.props.audio.track.attach($(this.refs.localAudio)[0]);
+  }
+
   render() {
     return <div>
-      {this.props.video ? <video autoPlay="1" id={'localVideo' + this.props.video.index} src={this.props.video.src} /> : null}
-      {this.props.audio ? <audio autoPlay="1" muted="true" id={'localAudio' + this.props.audio.index} src={this.props.audio.src} /> : null}
+      {this.props.video ? <video ref='localVideo' autoPlay='1' id={'localVideo' + this.props.video.index} src={this.props.video.src} /> : null}
+      {this.props.audio ? <audio ref='localAudio' autoPlay='1' muted='true' id={'localAudio' + this.props.audio.index} src={this.props.audio.src} /> : null}
     </div>
   }
 }
@@ -166,19 +171,21 @@ export default (ComposedComponent) => {
 
       for (let i = 0; i < this.localTracks.length; i++) {
         if (this.localTracks[i].getType() == "video") {
-            this.localTracks[i].attach("");
+            //this.localTracks[i].attach("");
             videoConnection = {
               index: i,
               src: this.localTracks[i].stream.jitsiObjectURL,
+              track: this.localTracks[i],
             }
         } else {
-            this.localTracks[i].attach("");
+            //this.localTracks[i].attach("");
             audioConnection = {
               index: i,
               src: this.localTracks[i].stream.jitsiObjectURL,
+              track: this.localTracks[i],
             }
         }
-        this.state.xrtcSDK.addTrack(this.localTracks[i]);
+        //this.state.xrtcSDK.addTrack(this.localTracks[i]);
       }
       localConnectionList.push({
         video: videoConnection,
