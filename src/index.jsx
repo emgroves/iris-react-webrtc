@@ -44,9 +44,16 @@ export let LocalVideo = class LocalVideo extends React.Component {
     console.log(this.props);
   }
 
-  componentDidUpdate() {
+  componentDidMount() {
+    console.log('IN OF HERE IN OF HERE')
     this.props.video.track.attach($(this.refs.localVideo)[0]);
     this.props.audio.track.attach($(this.refs.localAudio)[0]);
+  }
+
+  componentWillUnmount() {
+    console.log('OUT OF HERE OUT OF HERE');
+    this.props.video.track.detach($(this.refs.localVideo)[0]);
+    this.props.audio.track.detach($(this.refs.localAudio)[0]);
   }
 
   render() {
@@ -62,15 +69,10 @@ export let RemoteVideo = class RemoteVideo extends React.Component {
     super(props);
   }
 
-  componentDidUpdate() {
-    this.props.video.track.attach($(this.refs['remoteVideo' + this.props.video.index])[0]);
-    this.props.audio.track.attach($(this.refs['remoteAudio' + this.props.audio.index])[0]);
-  }
-
   render() {
     return <div>
-      {this.props.video ? <video ref={'remoteVideo' + this.props.video.index} autoPlay="1" id={this.props.video.index} src={this.props.video.src} /> : null}
-      {this.props.audio ? <audio ref={'remoteAudio' + this.props.audio.index} autoPlay="1" id={this.props.audio.index} src={this.props.audio.src} /> : null}
+      {this.props.video ? <video autoPlay="1" id={this.props.video.index} src={this.props.video.src} /> : null}
+      {this.props.audio ? <audio autoPlay="1" id={this.props.audio.index} src={this.props.audio.src} /> : null}
     </div>
   }
 }
@@ -254,20 +256,18 @@ export default (ComposedComponent) => {
         remoteConnectionList = _.without(remoteConnectionList, existingConnection);
       }
 
-      //track.attach(id);
+      track.attach(id);
       if (track.getType() == "video") {
         console.log('onRemoteVideo video');
         videoConnection = {
           index: id,
           src: track.stream.jitsiObjectURL,
-          track: track,
         }
       } else {
         console.log('onRemoteVideo audio');
         audioConnection = {
           index: id,
           src: track.stream.jitsiObjectURL,
-          track: track,
         }
       }
       remoteConnectionList.push({
