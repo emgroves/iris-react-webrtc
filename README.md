@@ -11,7 +11,7 @@ npm install iris-react-webrtc
 or it can be included from webpage from following cdn:
 
 ```
-https://npmcdn.com/iris-react-webrtc@0.0.6/dist/iris.react.webrtc.min.js
+https://npmcdn.com/iris-react-webrtc@0.0.19/dist/iris.react.webrtc.min.js
 ```
 
 ## Components
@@ -29,16 +29,12 @@ Import package into your component with the following statement:
 import withWebRTC, { LocalVideo, RemoteVideo, WebRTCConstants } from 'iris-react-webrtc';
 ```
 
-Assuming that your component name is chat here is how you would export it to use withWebRTC:
+withWebRTC is HOC (Higher Order Component).  Assuming that your component name is chat here is how you would export it to use withWebRTC:
 
 ```
 class Chat extends React.Component {
   render() {
     return (
-      <div>
-        <button onClick={this.props.onAudioMute.bind(this)}>{this.state.isAudioMuted ? <i className="fa fa-microphone-slash fa-2x" aria-hidden="true"></i> : <i className="fa fa-microphone fa-2x" aria-hidden="true"></i>}</button>
-        <button onClick={this.props.onVideoMute.bind(this)}>{this.state.isVideoMuted ? <i className="fa fa-eye-slash fa-2x" aria-hidden="true"></i> : <i className="fa fa-video-camera fa-2x" aria-hidden="true"></i>}</button>
-      </div>
       <div>
         {this.props.localVideos.map((connection) => {
           return <LocalVideo key={connection.video.index} video={connection.video} audio={connection.audio} />
@@ -54,7 +50,7 @@ class Chat extends React.Component {
 export default withWebRTC(Chat);
 ```
 
-The above code also shows how you would display LocalVideo and RemoteVideo as well as install handlers for audio/video mute buttons.
+The above code also shows how you would display LocalVideo and RemoteVideo as well as install handlers for audio/video mute buttons.  withWebRTC provides functions and properties in this.props of your components.  They are listed in the section below.  localVideos and remoteVideos are lists of the available audio/video streams that can be displayed by the application. Iris React WebRTC library provides LocalVideo and RemoteVideo components to simplify the addition of video/audio as demonstrated in the snippet above.
 
 ## Available API Functions
 * initializeWebRTC - intialize WebRTC library
@@ -79,3 +75,4 @@ This is the list of available events and their constants that can be passed to a
 * onSessionEnded - WEB_RTC_ON_SESSION_ENDED
 * onConnectionError - WEB_RTC_ON_CONNECTION_ERROR
 * onNotificationReceived - WEB_RTC_ON_NOTIFICATION_RECEIVED
+* onDominantSpeakerChanged - WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED
