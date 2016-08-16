@@ -45,13 +45,11 @@ export let LocalVideo = class LocalVideo extends React.Component {
   }
 
   componentDidMount() {
-    console.log('IN OF HERE IN OF HERE')
     this.props.video.track.attach($(this.refs.localVideo)[0]);
     this.props.audio.track.attach($(this.refs.localAudio)[0]);
   }
 
   componentWillUnmount() {
-    console.log('OUT OF HERE OUT OF HERE');
     this.props.video.track.detach($(this.refs.localVideo)[0]);
     this.props.audio.track.detach($(this.refs.localAudio)[0]);
   }
@@ -371,6 +369,26 @@ export default (ComposedComponent) => {
       return this.state.remoteConnectionList ? this.state.remoteConnectionList : [];
     }
 
+    _getRootNodeId() {
+      if (this.state.xrtcSDK &&
+          this.state.xrtcSDK.connection &&
+          this.state.xrtcSDK.connection.options) {
+        return this.state.xrtcSDK.connection.options.eventNodeId;
+      }
+
+      return null;
+    }
+
+    _getRootChildNodeId() {
+      if (this.state.xrtcSDK &&
+          this.state.xrtcSDK.connection &&
+          this.state.xrtcSDK.connection.options) {
+        return this.state.xrtcSDK.connection.options.eventCnodeId;
+      }
+
+      return null;
+    }
+
     render() {
       return (
         <ComposedComponent
@@ -380,6 +398,8 @@ export default (ComposedComponent) => {
           onVideoMute={this._onVideoMute.bind(this)}
           localVideos={this.localVideos}
           remoteVideos={this.remoteVideos}
+          getRootNodeId={this._getRootNodeId.bind(this)}
+          getRootChildNodeId={this._getRootChildNodeId.bind(this)}
           endSession={this._sessionEnd.bind(this)}
           addWebRTCListener={this.eventEmitter.addWebRTCListener.bind(this.eventEmitter)}
           removeWebRTCListener={this.eventEmitter.removeWebRTCListener.bind(this.eventEmitter)}
