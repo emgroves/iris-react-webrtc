@@ -94,7 +94,7 @@ export default (ComposedComponent) => {
       this.eventEmitter = new WebRTCEvents();
     }
 
-    _initializeWebRTC(userName, routingId, roomName, domain, eventManagerUrl, token, resolution = 'hd') {
+    _initializeWebRTC(userName, routingId, roomName, domain, hosts, token, resolution = 'hd') {
       console.log('initializeWebRTC -> userName ' + userName);
       console.log('initializeWebRTC -> routingId ' + routingId);
       console.log('initializeWebRTC -> roomName ' + roomName);
@@ -111,10 +111,12 @@ export default (ComposedComponent) => {
         routingId: routingId,
         traceId: traceId,
         useEventManager: true,
-        callType: "videocall",
-        loginType: "connect",
+        callType: 'videocall',
+        loginType: 'connect',
         resolution: resolution,
-        eventManager: eventManagerUrl
+        eventManager: hosts.eventManagerUrl,
+        notificationServer: hosts.notificationServer,
+        nodeServer: hosts.nodeServer,
       }
       let serverConfig = userConfig;
       console.log("init SDK");
