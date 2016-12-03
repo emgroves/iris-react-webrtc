@@ -94,12 +94,13 @@ export default (ComposedComponent) => {
       this.eventEmitter = new WebRTCEvents();
     }
 
-    _initializeWebRTC(userName, routingId, roomName, domain, hosts, token, resolution = 'hd') {
+    _initializeWebRTC(userName, routingId, roomName, domain, hosts, token, resolution = '640') {
       console.log('initializeWebRTC -> userName ' + userName);
       console.log('initializeWebRTC -> routingId ' + routingId);
       console.log('initializeWebRTC -> roomName ' + roomName);
       console.log('initializeWebRTC -> domain ' + domain);
       console.log('initializeWebRTC -> resolution ' + resolution);
+      console.log(hosts);
 
       const traceId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);});
       let userConfig = {
@@ -108,20 +109,23 @@ export default (ComposedComponent) => {
         roomName: roomName,
         domain: domain,
         token: token,
-        routingId: routingId,
+        routingId: routingId + '@' + domain,
+        anonymous: true,
         traceId: traceId,
         useEventManager: true,
         callType: 'videocall',
         loginType: 'connect',
         resolution: resolution,
         eventManager: hosts.eventManagerUrl,
-        notificationServer: hosts.notificationServer,
-        nodeServer: hosts.nodeServer,
+        notificationManager: hosts.notificationServer,
+        UEStatsServer: '',
       }
       let serverConfig = userConfig;
       console.log("init SDK");
       console.log(userConfig);
-      let xrtcSDK = new window.xrtcSDK(serverConfig);
+      let xrtcSDK = IrisRtcSdk;
+      console.log(xrtcSDK);
+      xrtcSDK.init(serverConfig);
       this.setState({
         xrtcSDK: xrtcSDK,
         userConfig: userConfig,
@@ -129,10 +133,20 @@ export default (ComposedComponent) => {
 
       console.log(userConfig);
 
-      xrtcSDK.createReceiver(userConfig.jid);
-      xrtcSDK.createSession([], userConfig, this._onWebRTCConnect);
+      // create connection
+      const irisRtcConn = new xrtcSDK.Connection();
+      irisRtcConn.onConnectionError = this._onConnectionError.bind(this);
+      irisRtcConn.connect(userConfig.token, userConfig.routingId);
 
       if (xrtcSDK != null) {
+        xrtcSDK.onConnected = this._onConnected.bind(this);
+        xrtcSDK.onSessionJoined = this._onSessionJoined.bind(this);
+        xrtcSDK.onSessionEnd = this._onSessionEnd.bind(this);
+        xrtcSDK.onSessionParticipantLeft = this._onSessionParticipantLeft.bind(this);
+        xrtcSDK.onSessionParticipantJoined = this._onSessionParticipantJoined.bind(this);
+        xrtcSDK.onRemoteStream = this._onRemoteStream.bind(this);
+        xrtcSDK.onUserJoined = this._onUserJoined.bind(this);
+
         xrtcSDK.onLocalAudio = this._onLocalAudio.bind(this);
         xrtcSDK.onLocalVideo = this._onLocalVideo.bind(this);
         xrtcSDK.onSessionCreated = this._onSessionCreated.bind(this);
@@ -140,7 +154,7 @@ export default (ComposedComponent) => {
         xrtcSDK.onSessionConnected = this._onSessionConnected.bind(this);
         xrtcSDK.onRemoteVideo = this._onRemoteVideo.bind(this);
         xrtcSDK.onRemoteParticipantLeft = this._onRemoteParticipantLeft.bind(this);
-        xrtcSDK.onSessionEnded = this._onSessionEnded.bind(this);
+
         xrtcSDK.onConnectionError = this._onConnectionError.bind(this);
         xrtcSDK.onNotificationReceived = this._onNotificationReceived.bind(this);
         xrtcSDK.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
@@ -156,6 +170,63 @@ export default (ComposedComponent) => {
       if (this.state.xrtcSDK) {
         this.state.xrtcSDK.endSession();
       }
+    }
+
+    _onSessionParticipantLeft() {
+      console.log('_onSessionParticipantLeft');
+    }
+
+    _onSessionParticipantJoined(remoteUserInfo) {
+      console.log('_onSessionParticipantJoined');
+      console.log(remoteUserInfo);
+    }
+
+    _onSessionError(error) {
+      console.log(error);
+    }
+
+    _onSessionJoined() {
+      console.log('in _onSessionJoined');
+    }
+
+    _onConnectionError(error) {
+      console.log(error);
+    }
+
+    _onConnected() {
+      console.log('_onConnected');
+
+      // create local stream
+      const irisRtcStream = new this.state.xrtcSDK.Stream();
+      let localStream = irisRtcStream.createStream('video');
+      console.log('localStream:');
+      console.log(localStream);
+      this.state.xrtcSDK.onLocalStream = this._onLocalStream.bind(this);
+    }
+
+    _onLocalStream(localTracks) {
+      console.log('_onLocalStream');
+      console.log(localTracks);
+
+      // create session
+      const session = new this.state.xrtcSDK.Session();
+      session.onSessionError = this._onSessionError.bind(this);
+      session.createSession(localTracks, "", "");
+
+      // render local track
+      this._onLocalVideo('1234', localTracks);
+    }
+
+    _onRemoteStream(remoteTracks) {
+      console.log('_onRemoteStream');
+      console.log(remoteTracks);
+      this._onRemoteVideo('123', remoteTracks);
+    }
+
+    _onUserJoined(id, participant) {
+      console.log('_onUserJoined');
+      console.log(id);
+      console.log(participant);
     }
 
     _onWebRTCConnect(response) {
@@ -315,7 +386,7 @@ export default (ComposedComponent) => {
       this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, id);
     }
 
-    _onSessionEnded(sessionId) {
+    _onSessionEnd(sessionId) {
       console.log('onSessionEnded: ' + sessionId);
       this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_SESSION_ENDED, sessionId);
     }
