@@ -82,6 +82,9 @@ export default (ComposedComponent) => {
 
       this.state = {
         xrtcSDK: null,
+        irisRtcConn: null,
+        localRtcStream: null,
+        session: null,
         userConfig: null,
         isAudioMuted: false,
         isVideoMuted: false,
@@ -134,9 +137,9 @@ export default (ComposedComponent) => {
       console.log(userConfig);
 
       // create connection
-      const irisRtcConn = new xrtcSDK.Connection();
-      irisRtcConn.onConnectionError = this._onConnectionError.bind(this);
-      irisRtcConn.connect(userConfig.token, userConfig.routingId);
+      this.state.irisRtcConn = new xrtcSDK.Connection();
+      this.state.irisRtcConn.onConnectionError = this._onConnectionError.bind(this);
+      this.state.irisRtcConn.connect(userConfig.token, userConfig.routingId);
 
       if (xrtcSDK != null) {
         xrtcSDK.onConnected = this._onConnected.bind(this);
@@ -168,12 +171,14 @@ export default (ComposedComponent) => {
 
     _sessionEnd() {
       if (this.state.xrtcSDK) {
-        this.state.xrtcSDK.endSession();
+        this.state.session.endSession();
       }
     }
 
-    _onSessionParticipantLeft() {
+    _onSessionParticipantLeft(pid) {
       console.log('_onSessionParticipantLeft');
+      console.log(pid);
+      this._onRemoteParticipantLeft(pid);
     }
 
     _onSessionParticipantJoined(remoteUserInfo) {
@@ -197,8 +202,8 @@ export default (ComposedComponent) => {
       console.log('_onConnected');
 
       // create local stream
-      const irisRtcStream = new this.state.xrtcSDK.Stream();
-      let localStream = irisRtcStream.createStream('video');
+      this.state.localRtcStream = new this.state.xrtcSDK.Stream();
+      let localStream = this.state.localRtcStream.createStream('video');
       console.log('localStream:');
       console.log(localStream);
       this.state.xrtcSDK.onLocalStream = this._onLocalStream.bind(this);
@@ -209,9 +214,9 @@ export default (ComposedComponent) => {
       console.log(localTracks);
 
       // create session
-      const session = new this.state.xrtcSDK.Session();
-      session.onSessionError = this._onSessionError.bind(this);
-      session.createSession(localTracks, "", "");
+      this.state.session = new this.state.xrtcSDK.Session();
+      this.state.session.onSessionError = this._onSessionError.bind(this);
+      this.state.session.createSession(localTracks, "", "");
 
       // render local track
       this._onLocalVideo('1234', localTracks);
@@ -220,7 +225,7 @@ export default (ComposedComponent) => {
     _onRemoteStream(remoteTracks) {
       console.log('_onRemoteStream');
       console.log(remoteTracks);
-      this._onRemoteVideo('123', remoteTracks);
+      this._onRemoteVideo(remoteTracks.sid, remoteTracks);
     }
 
     _onUserJoined(id, participant) {
@@ -308,6 +313,7 @@ export default (ComposedComponent) => {
       let idx = this.remoteTracks[participant].push(track);
       let baseId = participant.replace(/(-.*$)|(@.*$)/,'');
       let id = baseId + track.getType();
+      console.log('_onRemoteVideo ID: ' + id);
 
       let remoteConnectionList = this.state.remoteConnectionList;
       let audioConnection = null;
@@ -364,6 +370,7 @@ export default (ComposedComponent) => {
       console.log('onRemoteParticipantLeft: ' + id);
 
       if (!this.remoteTracks[id]) {
+        console.log('NO REMOTE TRACK FOUND')
         return;
       }
 
@@ -388,6 +395,9 @@ export default (ComposedComponent) => {
 
     _onSessionEnd(sessionId) {
       console.log('onSessionEnded: ' + sessionId);
+      if (this.state.xrtcSDK) {
+        this.state.irisRtcConn.disconnect();
+      }
       this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_SESSION_ENDED, sessionId);
     }
 
@@ -406,7 +416,7 @@ export default (ComposedComponent) => {
       this.setState({
         isAudioMuted: isMuted,
       }, () => {
-        this.state.xrtcSDK.audioMuteUnmute(isMuted, (response) => {
+        this.state.localRtcStream.toggleAudioMute(isMuted, (response) => {
           if (!response) {
             console.log("Local audio mute/unmute failed");
             this.setState({
@@ -423,7 +433,7 @@ export default (ComposedComponent) => {
       this.setState({
         isVideoMuted: isMuted,
       }, () => {
-        this.state.xrtcSDK.videoMuteUnmute(isMuted, (response) => {
+        this.state.localRtcStream.toggleVideoMute(isMuted, (response) => {
           if (!response) {
             this.setState({
               isVideoMuted: !this.state.isVideoMuted,
