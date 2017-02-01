@@ -237,7 +237,6 @@ export default (ComposedComponent) => {
       // create session
       var session = new this.state.xrtcSDK.Session();
       session.onSessionError = this._onSessionError.bind(this);
-      console.log('creating session with roomName: ' + this.state.roomName);
       session.createSession(localTracks, "", {roomId: this.state.roomName});
 
       this.setState({session: session});
