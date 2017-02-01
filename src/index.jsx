@@ -165,11 +165,7 @@ export default (ComposedComponent) => {
         xrtcSDK.onConnectionError = this._onConnectionError.bind(this);
         xrtcSDK.onNotificationReceived = this._onNotificationReceived.bind(this);
         xrtcSDK.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
-        xrtcSDK.onMuteParticipant = this._onMuteParticipant.bind(this);
       }
-    }
-
-    _onMuteParticipant(connection) {
     }
 
     _sendChatMessage(userId, message) {
@@ -502,7 +498,6 @@ export default (ComposedComponent) => {
           initializeWebRTC={this._initializeWebRTC.bind(this)}
           onAudioMute={this._onAudioMute.bind(this)}
           onVideoMute={this._onVideoMute.bind(this)}
-          onMuteParticipant={this._onMuteParticipant.bind(this)}
           localVideos={this.localVideos}
           remoteVideos={this.remoteVideos}
           getRootNodeId={this._getRootNodeId.bind(this)}
