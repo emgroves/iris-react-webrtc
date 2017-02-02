@@ -82,6 +82,7 @@ export default (ComposedComponent) => {
 
       this.state = {
         xrtcSDK: null,
+        roomName: null,
         irisRtcConn: null,
         localRtcStream: null,
         session: null,
@@ -90,6 +91,7 @@ export default (ComposedComponent) => {
         isVideoMuted: false,
         localConnectionList: [],
         remoteConnectionList: [],
+        chatMessageHistory: [],
       }
 
       this.localTracks = [];
@@ -132,6 +134,7 @@ export default (ComposedComponent) => {
       this.setState({
         xrtcSDK: xrtcSDK,
         userConfig: userConfig,
+        roomName: roomName,
       });
 
       console.log(userConfig);
@@ -149,6 +152,7 @@ export default (ComposedComponent) => {
         xrtcSDK.onSessionParticipantJoined = this._onSessionParticipantJoined.bind(this);
         xrtcSDK.onRemoteStream = this._onRemoteStream.bind(this);
         xrtcSDK.onUserJoined = this._onUserJoined.bind(this);
+        xrtcSDK.onChatMsgReceived = this._onChatMsgReceived.bind(this);
 
         xrtcSDK.onLocalAudio = this._onLocalAudio.bind(this);
         xrtcSDK.onLocalVideo = this._onLocalVideo.bind(this);
@@ -162,6 +166,19 @@ export default (ComposedComponent) => {
         xrtcSDK.onNotificationReceived = this._onNotificationReceived.bind(this);
         xrtcSDK.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
       }
+    }
+
+    _sendChatMessage(userId, message) {
+      console.log('Sending message from ' + userId + ' in _sendChatMessage saying: ' + message);
+      this.state.session.sendChatMessage({ txt : message, time: Date.now()});
+    }
+
+    _onChatMsgReceived(userUrl, message, timestamp) {
+      console.log('Received chat message from: ' + userUrl + ' saying: ' + message + ' at: ' + timestamp); 
+      const routingId = userUrl.substring(0, userUrl.indexOf("@"));
+
+      // add to chat history whenever we receive a message from remote participants
+      this.setState({chatMessageHistory: this.state.chatMessageHistory.concat([{routingId: routingId, message: message}])});
     }
 
     _onDominantSpeakerChanged(dominantSpeakerEndpoint) {
@@ -214,9 +231,11 @@ export default (ComposedComponent) => {
       console.log(localTracks);
 
       // create session
-      this.state.session = new this.state.xrtcSDK.Session();
-      this.state.session.onSessionError = this._onSessionError.bind(this);
-      this.state.session.createSession(localTracks, "", "");
+      var session = new this.state.xrtcSDK.Session();
+      session.onSessionError = this._onSessionError.bind(this);
+      session.createSession(localTracks, "", {roomId: this.state.roomName});
+
+      this.setState({session: session});
 
       // render local track
       this._onLocalVideo('1234', localTracks);
@@ -486,6 +505,8 @@ export default (ComposedComponent) => {
           endSession={this._sessionEnd.bind(this)}
           addWebRTCListener={this.eventEmitter.addWebRTCListener.bind(this.eventEmitter)}
           removeWebRTCListener={this.eventEmitter.removeWebRTCListener.bind(this.eventEmitter)}
+          sendChatMessage={this._sendChatMessage.bind(this)}
+          chatMessageHistory={this.state.chatMessageHistory} 
         />
       )
     }
