@@ -494,6 +494,7 @@ export default (ComposedComponent) => {
     render() {
       return (
         <ComposedComponent
+          {...this.props}
           params={this.props.params}
           initializeWebRTC={this._initializeWebRTC.bind(this)}
           onAudioMute={this._onAudioMute.bind(this)}
