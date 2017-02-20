@@ -248,7 +248,6 @@ export default (ComposedComponent) => {
       console.log(localTracks);
 
       var session = this.state.session;
-      console.log('session is null? ' + session);
       session.localTracks = localTracks;
       this.setState({session: session});
 
