@@ -511,6 +511,7 @@ export default (ComposedComponent) => {
           {...this.props}
           params={this.props.params}
           initializeWebRTC={this._initializeWebRTC.bind(this)}
+          isWebRTCInitialized={(this.state.xrtcSDK !== undefined)}
           onAudioMute={this._onAudioMute.bind(this)}
           onVideoMute={this._onVideoMute.bind(this)}
           localVideos={this.localVideos}
