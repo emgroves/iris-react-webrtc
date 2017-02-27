@@ -218,17 +218,6 @@ export default (ComposedComponent) => {
     _onConnected() {
       console.log('_onConnected');
 
-      // create session
-      var session = new this.state.xrtcSDK.Session();
-      session.onSessionError = this._onSessionError.bind(this);
-      session.createSession(null, "", {roomId: this.state.roomName});
-
-      // set session, chat history should be refetched on connection
-      this.setState({session: session, chatMessageHistory: []});
-    }
-
-    _createLocalStream() {
-      console.log('_createLocalStream');
       // create local stream
       this.state.localRtcStream = new this.state.xrtcSDK.Stream();
       let localStream = this.state.localRtcStream.createStream('video');
@@ -237,18 +226,15 @@ export default (ComposedComponent) => {
       this.state.xrtcSDK.onLocalStream = this._onLocalStream.bind(this);
     }
 
-    _endLocalStream() {
-      console.log('_endLocalStream');
-      // end local stream
-      this.state.localRtcStream = null;
-    }
-
     _onLocalStream(localTracks) {
       console.log('_onLocalStream');
       console.log(localTracks);
 
-      var session = this.state.session;
-      session.localTracks = localTracks;
+      // create session
+      var session = new this.state.xrtcSDK.Session();
+      session.onSessionError = this._onSessionError.bind(this);
+      session.createSession(localTracks, "", {roomId: this.state.roomName});
+
       this.setState({session: session});
 
       // render local track
@@ -522,8 +508,6 @@ export default (ComposedComponent) => {
           addWebRTCListener={this.eventEmitter.addWebRTCListener.bind(this.eventEmitter)}
           removeWebRTCListener={this.eventEmitter.removeWebRTCListener.bind(this.eventEmitter)}
           sendChatMessage={this._sendChatMessage.bind(this)}
-          createLocalStream={this._createLocalStream.bind(this)}
-          endLocalStream={this._endLocalStream.bind(this)}
           chatMessageHistory={this.state.chatMessageHistory} 
         />
       )
