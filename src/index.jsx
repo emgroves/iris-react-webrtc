@@ -115,7 +115,7 @@ export default (ComposedComponent) => {
         domain: domain,
         token: token,
         routingId: routingId + '@' + domain,
-        anonymous: true,
+        anonymous: false,
         traceId: traceId,
         useEventManager: true,
         callType: 'videocall',
@@ -170,7 +170,7 @@ export default (ComposedComponent) => {
 
     _sendChatMessage(userId, message) {
       console.log('Sending message from ' + userId + ' in _sendChatMessage saying: ' + message);
-      this.state.session.sendChatMessage({ txt : message, time: Date.now()});
+      this.state.session.sendChatMessage(message);
     }
 
     _onChatMsgReceived(userUrl, message, timestamp) {
@@ -188,7 +188,14 @@ export default (ComposedComponent) => {
 
     _sessionEnd() {
       if (this.state.xrtcSDK) {
+        const tracks = this.state.localRtcStream.getLocalTracks();
+
+        tracks.forEach((t) => {
+          t.dispose();
+        });
+
         this.state.session.endSession();
+        this.setState({localRtcStream: null, localConnectionList: [], remoteConnectionList: []});
       }
     }
 
@@ -217,6 +224,8 @@ export default (ComposedComponent) => {
 
     _onConnected() {
       console.log('_onConnected');
+
+      this.setState({chatMessageHistory: []});
 
       // create local stream
       this.state.localRtcStream = new this.state.xrtcSDK.Stream();
