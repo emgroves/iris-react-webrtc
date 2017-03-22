@@ -45,13 +45,21 @@ export let LocalVideo = class LocalVideo extends React.Component {
   }
 
   componentDidMount() {
-    this.props.video.track.attach($(this.refs.localVideo)[0]);
-    this.props.audio.track.attach($(this.refs.localAudio)[0]);
+    if (this.props.video) {
+      this.props.video.track.attach($(this.refs.localVideo)[0]);
+    }
+    if (this.props.audio) {
+      this.props.audio.track.attach($(this.refs.localAudio)[0]);
+    }
   }
 
   componentWillUnmount() {
-    this.props.video.track.detach($(this.refs.localVideo)[0]);
-    this.props.audio.track.detach($(this.refs.localAudio)[0]);
+    if (this.props.video) {
+      this.props.video.track.detach($(this.refs.localVideo)[0]);
+    }
+    if (this.props.audio) {
+      this.props.audio.track.detach($(this.refs.localAudio)[0]);
+    }
   }
 
   render() {
@@ -92,6 +100,7 @@ export default (ComposedComponent) => {
         localConnectionList: [],
         remoteConnectionList: [],
         chatMessageHistory: [],
+        isSharingScreen: false,
       }
 
       this.localTracks = [];
@@ -107,7 +116,7 @@ export default (ComposedComponent) => {
       console.log('initializeWebRTC -> resolution ' + resolution);
       console.log(hosts);
 
-      const traceId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);});
+      const traceId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) { var r = Math.random() * 16 | 0, v = c == 'x' ? r : r & 0x3 | 0x8; return v.toString(16); });
       let userConfig = {
         jid: userName,
         password: '',
@@ -174,11 +183,11 @@ export default (ComposedComponent) => {
     }
 
     _onChatMsgReceived(userUrl, message, timestamp) {
-      console.log('Received chat message from: ' + userUrl + ' saying: ' + message + ' at: ' + timestamp); 
+      console.log('Received chat message from: ' + userUrl + ' saying: ' + message + ' at: ' + timestamp);
       const routingId = userUrl.substring(0, userUrl.indexOf("@"));
 
       // add to chat history whenever we receive a message from remote participants
-      this.setState({chatMessageHistory: this.state.chatMessageHistory.concat([{routingId: routingId, message: message}])});
+      this.setState({ chatMessageHistory: this.state.chatMessageHistory.concat([{ routingId: routingId, message: message }]) });
     }
 
     _onDominantSpeakerChanged(dominantSpeakerEndpoint) {
@@ -195,7 +204,7 @@ export default (ComposedComponent) => {
         });
 
         this.state.session.endSession();
-        this.setState({localRtcStream: null, localConnectionList: [], remoteConnectionList: []});
+        this.setState({ localRtcStream: null, localConnectionList: [], remoteConnectionList: [] });
       }
     }
 
@@ -225,11 +234,17 @@ export default (ComposedComponent) => {
     _onConnected() {
       console.log('_onConnected');
 
-      this.setState({chatMessageHistory: []});
+      this.setState({ chatMessageHistory: [] });
+
+      const streamConfig = {
+        'streamType': 'video',
+        'resolution': 'hd'
+      };
+      console.log('----> StreamConfig: ' + JSON.stringify(streamConfig));
 
       // create local stream
       this.state.localRtcStream = new this.state.xrtcSDK.Stream();
-      let localStream = this.state.localRtcStream.createStream('video');
+      let localStream = this.state.localRtcStream.createStream(streamConfig);
       console.log('localStream:');
       console.log(localStream);
       this.state.xrtcSDK.onLocalStream = this._onLocalStream.bind(this);
@@ -238,13 +253,17 @@ export default (ComposedComponent) => {
     _onLocalStream(localTracks) {
       console.log('_onLocalStream');
       console.log(localTracks);
+      console.log('----> Local Tracks: ' + JSON.stringify(localTracks));
 
-      // create session
-      var session = new this.state.xrtcSDK.Session();
-      session.onSessionError = this._onSessionError.bind(this);
-      session.createSession(localTracks, "", {roomId: this.state.roomName});
+      if (this.state.session === null || this.state.session === undefined) {
 
-      this.setState({session: session});
+        // create session
+        var session = new this.state.xrtcSDK.Session();
+        session.onSessionError = this._onSessionError.bind(this);
+        session.createSession(localTracks, "", { roomId: this.state.roomName });
+
+        this.setState({ session: session });
+      }
 
       // render local track
       this._onLocalVideo('1234', localTracks);
@@ -284,22 +303,29 @@ export default (ComposedComponent) => {
 
       for (let i = 0; i < this.localTracks.length; i++) {
         if (this.localTracks[i].getType() == "video") {
-            //this.localTracks[i].attach("");
-            videoConnection = {
-              index: i,
-              src: this.localTracks[i].stream.jitsiObjectURL,
-              track: this.localTracks[i],
-            }
+          //this.localTracks[i].attach("");
+          console.log('----> Track object URL: ' + this.localTracks[i].stream.jitsiObjectURL);
+          videoConnection = {
+            index: i,
+            src: this.localTracks[i].stream.jitsiObjectURL,
+            track: this.localTracks[i],
+          }
         } else {
-            //this.localTracks[i].attach("");
-            audioConnection = {
-              index: i,
-              src: this.localTracks[i].stream.jitsiObjectURL,
-              track: this.localTracks[i],
-            }
+          //this.localTracks[i].attach("");
+          audioConnection = {
+            index: i,
+            src: this.localTracks[i].stream.jitsiObjectURL,
+            track: this.localTracks[i],
+          }
         }
         //this.state.xrtcSDK.addTrack(this.localTracks[i]);
       }
+      if (this.state.isSharingScreen && localConnectionList.length > 0) {
+        // replace the current local video with the screenshare (if one exists)
+        console.log('----> localConnectionList: ' + localConnectionList.length);
+        localConnectionList.pop();
+      }
+      console.log('----> localConnectionList: ' + localConnectionList.length);
       localConnectionList.push({
         video: videoConnection,
         audio: audioConnection,
@@ -337,9 +363,9 @@ export default (ComposedComponent) => {
 
       let participant = track.getParticipantId();
       if (!this.remoteTracks[participant])
-          this.remoteTracks[participant] = [];
+        this.remoteTracks[participant] = [];
       let idx = this.remoteTracks[participant].push(track);
-      let baseId = participant.replace(/(-.*$)|(@.*$)/,'');
+      let baseId = participant.replace(/(-.*$)|(@.*$)/, '');
       let id = baseId + track.getType();
       console.log('_onRemoteVideo ID: ' + id);
 
@@ -404,7 +430,7 @@ export default (ComposedComponent) => {
 
       let tracks = this.remoteTracks[id];
       for (let i = 0; i < tracks.length; i++) {
-        let baseId = id.replace(/(-.*$)|(@.*$)/,'');
+        let baseId = id.replace(/(-.*$)|(@.*$)/, '');
         //tracks[i].detach(trackId);
 
         let remoteConnectionList = this.state.remoteConnectionList;
@@ -482,8 +508,8 @@ export default (ComposedComponent) => {
 
     _getRootNodeId() {
       if (this.state.xrtcSDK &&
-          this.state.xrtcSDK.connection &&
-          this.state.xrtcSDK.connection.options) {
+        this.state.xrtcSDK.connection &&
+        this.state.xrtcSDK.connection.options) {
         return this.state.xrtcSDK.connection.options.eventNodeId;
       }
 
@@ -492,12 +518,49 @@ export default (ComposedComponent) => {
 
     _getRootChildNodeId() {
       if (this.state.xrtcSDK &&
-          this.state.xrtcSDK.connection &&
-          this.state.xrtcSDK.connection.options) {
+        this.state.xrtcSDK.connection &&
+        this.state.xrtcSDK.connection.options) {
         return this.state.xrtcSDK.connection.options.eventCnodeId;
       }
 
       return null;
+    }
+
+    _startScreenshare(screenSourceId) {
+      console.log('----> STARTING SCREEN SHARE');
+
+      const screenShareConfig = {
+        constraints: {
+          audio: false,
+          video: {
+
+            mandatory: {
+              chromeMediaSource: "desktop",
+              chromeMediaSourceId: event.data.sourceId
+            }
+          }
+        }
+      };
+
+      this.setState({ isSharingScreen: true }, () => {
+        console.log('----> screenShareConfig: ' + JSON.stringify(screenShareConfig));
+        this.state.session.switchStream(screenShareConfig);
+        console.log(this.state.session.session.peerconnection);
+        console.log(this.state.session.session.connection.xmpp.getSessions());
+      });
+    }
+
+    _endScreenshare() {
+      console.log('----> ENDING SCREEN SHARE');
+
+      const streamConfig = {
+        'streamType': 'video',
+        'resolution': 'hd'
+      };
+
+      this.setState({ isSharingScreen: false }, () => {
+        this.state.session.switchStream(streamConfig);
+      });
     }
 
     render() {
@@ -517,7 +580,10 @@ export default (ComposedComponent) => {
           addWebRTCListener={this.eventEmitter.addWebRTCListener.bind(this.eventEmitter)}
           removeWebRTCListener={this.eventEmitter.removeWebRTCListener.bind(this.eventEmitter)}
           sendChatMessage={this._sendChatMessage.bind(this)}
-          chatMessageHistory={this.state.chatMessageHistory} 
+          chatMessageHistory={this.state.chatMessageHistory}
+          startScreenshare={this._startScreenshare.bind(this)}
+          endScreenshare={this._endScreenshare.bind(this)}
+          isSharingScreen={this.state.isSharingScreen}
         />
       )
     }
