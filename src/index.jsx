@@ -82,7 +82,7 @@ export default (ComposedComponent) => {
 
       this.state = {
         xrtcSDK: null,
-        roomName: null,
+        roomId: null,
         irisRtcConn: null,
         localRtcStream: null,
         session: null,
@@ -99,10 +99,10 @@ export default (ComposedComponent) => {
       this.eventEmitter = new WebRTCEvents();
     }
 
-    _initializeWebRTC(userName, routingId, roomName, domain, hosts, token, resolution = '640') {
+    _initializeWebRTC(userName, routingId, roomId, domain, hosts, token, resolution = '640') {
       console.log('initializeWebRTC -> userName ' + userName);
       console.log('initializeWebRTC -> routingId ' + routingId);
-      console.log('initializeWebRTC -> roomName ' + roomName);
+      console.log('initializeWebRTC -> roomId ' + roomId);
       console.log('initializeWebRTC -> domain ' + domain);
       console.log('initializeWebRTC -> resolution ' + resolution);
       console.log(hosts);
@@ -111,12 +111,14 @@ export default (ComposedComponent) => {
       let userConfig = {
         jid: userName,
         password: '',
-        roomName: roomName,
+        roomId: roomId,
         domain: domain,
         token: token,
         routingId: routingId + '@' + domain,
         anonymous: false,
         traceId: traceId,
+        useSecureAPI: true,
+        allDomain: false,
         useEventManager: true,
         callType: 'videocall',
         loginType: 'connect',
@@ -134,7 +136,7 @@ export default (ComposedComponent) => {
       this.setState({
         xrtcSDK: xrtcSDK,
         userConfig: userConfig,
-        roomName: roomName,
+        roomId: roomId,
       });
 
       console.log(userConfig);
@@ -187,6 +189,7 @@ export default (ComposedComponent) => {
     }
 
     _sessionEnd() {
+      console.log('_sessionEnd');
       if (this.state.xrtcSDK) {
         const tracks = this.state.localRtcStream.getLocalTracks();
 
@@ -229,7 +232,15 @@ export default (ComposedComponent) => {
 
       // create local stream
       this.state.localRtcStream = new this.state.xrtcSDK.Stream();
-      let localStream = this.state.localRtcStream.createStream('video');
+      let streamConfig = {   
+        "streamType": "video", // or "audio",
+        "resolution": "hd",// or "sd",
+        "constraints": {
+          audio: true, 
+          video: true
+          } // contraints required to create the stream (optional)
+      }
+      let localStream = this.state.localRtcStream.createStream(streamConfig);
       console.log('localStream:');
       console.log(localStream);
       this.state.xrtcSDK.onLocalStream = this._onLocalStream.bind(this);
@@ -242,7 +253,7 @@ export default (ComposedComponent) => {
       // create session
       var session = new this.state.xrtcSDK.Session();
       session.onSessionError = this._onSessionError.bind(this);
-      session.createSession(localTracks, "", {roomId: this.state.roomName});
+      session.createSessionWithRoomId(localTracks, this.state.roomId);
 
       this.setState({session: session});
 
@@ -314,11 +325,11 @@ export default (ComposedComponent) => {
       });
     }
 
-    _onSessionCreated(sessionId, roomName) {
-      console.log('onSessionCreated - session created with ' + sessionId + ' and user joined in ' + roomName);
+    _onSessionCreated(sessionId, roomId) {
+      console.log('onSessionCreated - session created with ' + sessionId + ' and user joined in ' + roomId);
       this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_SESSION_CREATED, {
         sessionId,
-        roomName,
+        roomId,
       });
     }
 
