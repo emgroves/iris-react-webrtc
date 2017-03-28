@@ -92,7 +92,6 @@ export default (ComposedComponent) => {
         localConnectionList: [],
         remoteConnectionList: [],
         chatMessageHistory: [],
-        hasConnected: false,
       }
 
       this.localTracks = [];
