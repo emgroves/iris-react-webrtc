@@ -1,6 +1,6 @@
 {
   "name": "iris-react-webrtc",
-  "version": "1.0.8",
+  "version": "1.0.13",
   "description": "React components for Iris WebRTC library",
   "main": "dist/index.js",
   "scripts": {

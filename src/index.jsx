@@ -229,7 +229,7 @@ export default (ComposedComponent) => {
     _onConnected() {
       console.log('_onConnected');
 
-      this.setState({chatMessageHistory: [], hasConnected: true});
+      this.setState({chatMessageHistory: []});
 
       // create local stream
       this.state.localRtcStream = new this.state.xrtcSDK.Stream();
@@ -518,6 +518,7 @@ export default (ComposedComponent) => {
           {...this.props}
           params={this.props.params}
           initializeWebRTC={this._initializeWebRTC.bind(this)}
+          isWebRTCInitialized={(this.state.xrtcSDK !== undefined && this.state.xrtcSDK !== null)}
           onAudioMute={this._onAudioMute.bind(this)}
           onVideoMute={this._onVideoMute.bind(this)}
           localVideos={this.localVideos}
