@@ -99,7 +99,7 @@ export default (ComposedComponent) => {
       this.eventEmitter = new WebRTCEvents();
     }
 
-    _initializeWebRTC(userName, routingId, roomId, domain, hosts, token, resolution = '640') {
+    _initializeWebRTC(userName, routingId, roomId, domain, hosts, token, resolution = '640', allDomain = false) {
       console.log('initializeWebRTC -> userName ' + userName);
       console.log('initializeWebRTC -> routingId ' + routingId);
       console.log('initializeWebRTC -> roomId ' + roomId);
@@ -118,7 +118,7 @@ export default (ComposedComponent) => {
         anonymous: false,
         traceId: traceId,
         useSecureAPI: true,
-        allDomain: false,
+        allDomain: allDomain,
         useEventManager: true,
         callType: 'videocall',
         loginType: 'connect',
@@ -176,7 +176,7 @@ export default (ComposedComponent) => {
     }
 
     _onChatMsgReceived(userUrl, message, timestamp) {
-      console.log('Received chat message from: ' + userUrl + ' saying: ' + message + ' at: ' + timestamp); 
+      console.log('Received chat message from: ' + userUrl + ' saying: ' + message + ' at: ' + timestamp);
       const routingId = userUrl.substring(0, userUrl.indexOf("@"));
 
       // add to chat history whenever we receive a message from remote participants
@@ -232,11 +232,11 @@ export default (ComposedComponent) => {
 
       // create local stream
       this.state.localRtcStream = new this.state.xrtcSDK.Stream();
-      let streamConfig = {   
+      let streamConfig = {
         "streamType": "video", // or "audio",
         "resolution": "hd",// or "sd",
         "constraints": {
-          audio: true, 
+          audio: true,
           video: true
           } // contraints required to create the stream (optional)
       }
@@ -528,7 +528,7 @@ export default (ComposedComponent) => {
           addWebRTCListener={this.eventEmitter.addWebRTCListener.bind(this.eventEmitter)}
           removeWebRTCListener={this.eventEmitter.removeWebRTCListener.bind(this.eventEmitter)}
           sendChatMessage={this._sendChatMessage.bind(this)}
-          chatMessageHistory={this.state.chatMessageHistory} 
+          chatMessageHistory={this.state.chatMessageHistory}
         />
       )
     }
