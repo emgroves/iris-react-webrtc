@@ -2,6 +2,7 @@ import React from 'react';
 import _ from 'underscore';
 import KeyMirror from 'keymirror'
 import { EventEmitter } from 'events';
+var request = require('request-promise-native');
 
 export const WebRTCConstants = KeyMirror({
   WEB_RTC_ON_LOCAL_AUDIO: null,
@@ -18,6 +19,66 @@ export const WebRTCConstants = KeyMirror({
   WEB_RTC_ON_VIDEO_MUTE: null,
   WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED: null,
 });
+
+
+export function CreateRoomForRoutingIds (routingIds, token, eventManagerUrl, domain) {
+  console.log('React SDK :: CreateRoom');
+  var participants = routingIds.map(function (routingId) {
+    return {
+      history: true,
+      notification: true,
+      owner: true,
+      room_identifier: true,
+      routing_id: routingId + '@' + domain
+    };
+  });
+
+  var requestOptions = {
+    url: eventManagerUrl+"createroom/participants",
+    json: true,
+    method: "PUT",
+    headers: {
+      "Authorization": "Bearer " + token
+    },
+    body: {
+      participants: participants
+    }
+  };
+  return request(requestOptions, function (error, response, body) {
+    return body;
+  }).catch(function (error) {
+    console.error('Error inside of CreateRoom: ' + error);
+  });
+}
+
+export function JoinRoom(routingId, roomId, token, eventManagerUrl, domain) {
+  console.log('React SDK :: JoinRoom');
+
+  var requestOptions = {
+    url: eventManagerUrl+"room/"+roomId+"/participants/add",
+    json: true,
+    method: "PUT",
+    headers: {
+      "Authorization": "Bearer " + token
+    },
+    body: {
+      participants: [{
+        history: true,
+        notification: true,
+        owner: false,
+        room_identifier: false,
+        routing_id: routingId + '@' + domain
+      }]
+    }
+  };
+  return request(requestOptions)
+  .then(() => {
+    return true;
+  })
+  .catch(function (error) {
+    console.error('Error inside of JoinRoom: ' + error);
+  });
+}
 
 export let WebRTCEvents = class WebRTCEvents extends EventEmitter {
   constructor(props) {
