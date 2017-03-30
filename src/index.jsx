@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'underscore';
 import KeyMirror from 'keymirror'
 import { EventEmitter } from 'events';
-var request = require('request-promise-native');
+const request = require('request-promise-native');
 
 export const WebRTCConstants = KeyMirror({
   WEB_RTC_ON_LOCAL_AUDIO: null,
@@ -23,7 +23,7 @@ export const WebRTCConstants = KeyMirror({
 
 export function CreateRoomForRoutingIds (routingIds, token, eventManagerUrl, domain) {
   console.log('React SDK :: CreateRoom');
-  var participants = routingIds.map(function (routingId) {
+  const participants = routingIds.map(function (routingId) {
     return {
       history: true,
       notification: true,
@@ -33,7 +33,7 @@ export function CreateRoomForRoutingIds (routingIds, token, eventManagerUrl, dom
     };
   });
 
-  var requestOptions = {
+  const requestOptions = {
     url: eventManagerUrl+"createroom/participants",
     json: true,
     method: "PUT",
@@ -54,7 +54,7 @@ export function CreateRoomForRoutingIds (routingIds, token, eventManagerUrl, dom
 export function JoinRoom(routingId, roomId, token, eventManagerUrl, domain) {
   console.log('React SDK :: JoinRoom');
 
-  var requestOptions = {
+  const requestOptions = {
     url: eventManagerUrl+"room/"+roomId+"/participants/add",
     json: true,
     method: "PUT",
@@ -313,7 +313,7 @@ export default (ComposedComponent) => {
       console.log(localTracks);
 
       // create session
-      var session = new this.state.xrtcSDK.Session();
+      let session = new this.state.xrtcSDK.Session();
       session.onSessionError = this._onSessionError.bind(this);
       session.createSessionWithRoomId(localTracks, this.state.roomId);
 
