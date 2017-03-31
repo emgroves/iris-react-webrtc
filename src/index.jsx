@@ -136,10 +136,30 @@ export let RemoteVideo = class RemoteVideo extends React.Component {
     super(props);
   }
 
+  componentDidMount() {
+    if (this.props.video) {
+      this.props.video.track.attach($(this.refs.remoteVideo)[0]);
+    }
+
+    if (this.props.audio) {
+      this.props.audio.track.attach($(this.refs.remoteAudio)[0]);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.props.video) {
+      this.props.video.track.detach($(this.refs.remoteVideo)[0]);
+    }
+
+    if (this.props.audio) {
+      this.props.audio.track.detach($(this.refs.remoteAudio)[0]);
+    }
+  }
+
   render() {
     return <div>
-      {this.props.video ? <video autoPlay="1" id={this.props.video.index} src={this.props.video.src} /> : null}
-      {this.props.audio ? <audio autoPlay="1" id={this.props.audio.index} src={this.props.audio.src} /> : null}
+      {this.props.video ? <video ref='remoteVideo' autoPlay="1" id={this.props.video.index} src={this.props.video.src} /> : null}
+      {this.props.audio ? <audio ref='remoteAudio' autoPlay="1" id={this.props.audio.index} src={this.props.audio.src} /> : null}
     </div>
   }
 }
@@ -302,7 +322,7 @@ export default (ComposedComponent) => {
 
       // create local stream
       this.state.localRtcStream = new this.state.xrtcSDK.Stream();
-      const streamConfig = {  
+      const streamConfig = {
         "streamType": "video", // or "audio",
         "resolution": "hd",// or "sd",
         "constraints": {
@@ -445,18 +465,19 @@ export default (ComposedComponent) => {
         remoteConnectionList = _.without(remoteConnectionList, existingConnection);
       }
 
-      track.attach(id);
       if (track.getType() == "video") {
         console.log('onRemoteVideo video');
         videoConnection = {
           index: id,
           src: track.stream.jitsiObjectURL,
+          track: track
         }
       } else {
         console.log('onRemoteVideo audio');
         audioConnection = {
           index: id,
           src: track.stream.jitsiObjectURL,
+          track: track
         }
       }
       remoteConnectionList.push({
@@ -586,7 +607,7 @@ export default (ComposedComponent) => {
 
     _startScreenshare(screenSourceId) {
       console.log('----> STARTING SCREEN SHARE');
-      const localConnectionList = this.state.localConnectionList; 
+      const localConnectionList = this.state.localConnectionList;
       if (localConnectionList !== undefined && localConnectionList.length > 0) {
         // replace the current local video with the screenshare (if one exists)
         localConnectionList.pop();
@@ -630,7 +651,7 @@ export default (ComposedComponent) => {
             }
           });
           this.setState({ localConnectionList: localConnectionList }, () => resolve());
-        } 
+        }
       })
         .then(() => {
           const streamConfig = {
