@@ -22,7 +22,7 @@ export const WebRTCConstants = KeyMirror({
 
 
 export function CreateRoomForRoutingIds (routingIds, token, eventManagerUrl, domain) {
-  console.log('React SDK :: CreateRoom');
+  console.log('React SDK :: CreateRoomForRoutingIds');
   const participants = routingIds.map(function (routingId) {
     return {
       history: true,
@@ -35,6 +35,36 @@ export function CreateRoomForRoutingIds (routingIds, token, eventManagerUrl, dom
 
   const requestOptions = {
     url: eventManagerUrl+"createroom/participants",
+    json: true,
+    method: "PUT",
+    headers: {
+      "Authorization": "Bearer " + token
+    },
+    body: {
+      participants: participants
+    }
+  };
+  return request(requestOptions, function (error, response, body) {
+    return body;
+  }).catch(function (error) {
+    console.error('Error inside of CreateRoom: ' + error);
+  });
+}
+
+export function CreateRoomForName(roomName, routingIds, token, eventManagerUrl, domain) {
+  console.log('React SDK :: CreateRoomForName');
+  const participants = routingIds.map(function (routingId) {
+    return {
+      history: true,
+      notification: true,
+      owner: true,
+      room_identifier: true,
+      routing_id: routingId + '@' + domain
+    };
+  });
+
+  const requestOptions = {
+    url: eventManagerUrl+"createroom/room/"+roomName,
     json: true,
     method: "PUT",
     headers: {
