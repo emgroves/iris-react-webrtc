@@ -319,7 +319,6 @@ export default (ComposedComponent) => {
     _onLocalStream(localTracks) {
       console.log('_onLocalStream');
       console.log(localTracks);
-      console.log('----> Local Tracks: ' + JSON.stringify(localTracks));
 
       if (this.state.session === null || this.state.session === undefined) {
 
@@ -370,7 +369,6 @@ export default (ComposedComponent) => {
       for (let i = 0; i < this.localTracks.length; i++) {
         if (this.localTracks[i].getType() == "video") {
           //this.localTracks[i].attach("");
-          console.log('----> Track object URL: ' + this.localTracks[i].stream.jitsiObjectURL);
           videoConnection = {
             index: i,
             src: this.localTracks[i].stream.jitsiObjectURL,
@@ -386,12 +384,6 @@ export default (ComposedComponent) => {
         }
         //this.state.xrtcSDK.addTrack(this.localTracks[i]);
       }
-      // if (this.state.isSharingScreen && localConnectionList.length > 0) {
-      //   // replace the current local video with the screenshare (if one exists)
-      //   console.log('----> localConnectionList: ' + localConnectionList.length);
-      //   localConnectionList.pop();
-      // }
-      console.log('----> localConnectionList: ' + localConnectionList.length);
       localConnectionList.push({
         video: videoConnection,
         audio: audioConnection,
@@ -631,6 +623,7 @@ export default (ComposedComponent) => {
           // replace the current local video with the screenshare (if one exists)
           const screenshareConnection = localConnectionList.pop();
           // stop the tracks so that the browser knows we're done sharing the screen
+          // if we don't do this, chrome's screenshare bar won't close
           screenshareConnection.video.track.stream.getTracks().map((track) => {
             if (track.stop) {
               track.stop();
