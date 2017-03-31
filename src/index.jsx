@@ -239,15 +239,9 @@ export default (ComposedComponent) => {
 
       this.setState({ chatMessageHistory: [] });
 
-      const streamConfig = {
-        'streamType': 'video',
-        'resolution': 'hd'
-      };
-      console.log('----> StreamConfig: ' + JSON.stringify(streamConfig));
-
       // create local stream
       this.state.localRtcStream = new this.state.xrtcSDK.Stream();
-      let streamConfig = {   
+      const streamConfig = {   
         "streamType": "video", // or "audio",
         "resolution": "hd",// or "sd",
         "constraints": {
@@ -255,7 +249,7 @@ export default (ComposedComponent) => {
           video: true
           } // contraints required to create the stream (optional)
       }
-      let localStream = this.state.localRtcStream.createStream(streamConfig);
+      const localStream = this.state.localRtcStream.createStream(streamConfig);
       console.log('localStream:');
       console.log(localStream);
       this.state.xrtcSDK.onLocalStream = this._onLocalStream.bind(this);
@@ -331,11 +325,11 @@ export default (ComposedComponent) => {
         }
         //this.state.xrtcSDK.addTrack(this.localTracks[i]);
       }
-      if (this.state.isSharingScreen && localConnectionList.length > 0) {
-        // replace the current local video with the screenshare (if one exists)
-        console.log('----> localConnectionList: ' + localConnectionList.length);
-        localConnectionList.pop();
-      }
+      // if (this.state.isSharingScreen && localConnectionList.length > 0) {
+      //   // replace the current local video with the screenshare (if one exists)
+      //   console.log('----> localConnectionList: ' + localConnectionList.length);
+      //   localConnectionList.pop();
+      // }
       console.log('----> localConnectionList: ' + localConnectionList.length);
       localConnectionList.push({
         video: videoConnection,
@@ -539,6 +533,12 @@ export default (ComposedComponent) => {
 
     _startScreenshare(screenSourceId) {
       console.log('----> STARTING SCREEN SHARE');
+      const localConnectionList = this.state.localConnectionList; 
+      if (localConnectionList !== undefined && localConnectionList.length > 0) {
+        // replace the current local video with the screenshare (if one exists)
+        localConnectionList.pop();
+        this.setState({ localConnectionList: localConnectionList });
+      }
 
       const screenShareConfig = {
         constraints: {
@@ -564,14 +564,35 @@ export default (ComposedComponent) => {
     _endScreenshare() {
       console.log('----> ENDING SCREEN SHARE');
 
-      const streamConfig = {
-        'streamType': 'video',
-        'resolution': 'hd'
-      };
+      new Promise((resolve, reject) => {
+        const localConnectionList = this.state.localConnectionList;
+        if (localConnectionList !== undefined && localConnectionList.length > 0) {
+          // replace the current local video with the screenshare (if one exists)
+          const screenshareConnection = localConnectionList.pop();
+          // stop the tracks so that the browser knows we're done sharing the screen
+          screenshareConnection.video.track.stream.getTracks().map((track) => {
+            if (track.stop) {
+              track.stop();
+            }
+          });
+          this.setState({ localConnectionList: localConnectionList }, () => resolve());
+        } 
+      })
+        .then(() => {
+          const streamConfig = {
+            "streamType": "video", // or "audio",
+            "resolution": "hd",// or "sd",
+            "constraints": {
+              audio: true,
+              video: true
+            } // contraints required to create the stream (optional)
+          };
 
-      this.setState({ isSharingScreen: false }, () => {
-        this.state.session.switchStream(streamConfig);
-      });
+          this.setState({ isSharingScreen: false }, () => {
+            this.state.session.switchStream(streamConfig);
+          });
+        })
+        .catch((error) => console.error('ERROR: ' + error));
     }
 
     render() {
