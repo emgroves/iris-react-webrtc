@@ -370,15 +370,12 @@ export default (ComposedComponent) => {
       console.log('_onLocalStream');
       console.log(localTracks);
 
-      if (this.state.session === null || this.state.session === undefined) {
+      // create session
+      let session = new this.state.xrtcSDK.Session();
+      session.onSessionError = this._onSessionError.bind(this);
+      session.createSessionWithRoomId(localTracks, this.state.roomId);
 
-        // create session
-        let session = new this.state.xrtcSDK.Session();
-        session.onSessionError = this._onSessionError.bind(this);
-        session.createSessionWithRoomId(localTracks, this.state.roomId);
-
-        this.setState({ session: session });
-      }
+      this.setState({ session: session });
 
       // render local track
       this._onLocalVideo('1234', localTracks);
