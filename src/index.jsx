@@ -219,7 +219,7 @@ export default (ComposedComponent) => {
       this.eventEmitter = new WebRTCEvents();
     }
 
-    _initializeWebRTC(userName, routingId, roomId, domain, hosts, token, resolution = '640', allDomain = false) {
+    _initializeWebRTC(userName, routingId, roomId, domain, hosts, token, resolution = '640', allDomain = false, anonymous = false) {
       console.log('initializeWebRTC -> userName ' + userName);
       console.log('initializeWebRTC -> routingId ' + routingId);
       console.log('initializeWebRTC -> roomId ' + roomId);
@@ -235,7 +235,7 @@ export default (ComposedComponent) => {
         domain: domain,
         token: token,
         routingId: routingId + '@' + domain,
-        anonymous: false,
+        anonymous: anonymous,
         traceId: traceId,
         useSecureAPI: true,
         allDomain: allDomain,
