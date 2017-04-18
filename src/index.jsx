@@ -3,6 +3,7 @@ import _ from 'underscore';
 import KeyMirror from 'keymirror'
 import { EventEmitter } from 'events';
 const request = require('request-promise-native');
+const uuidV1 = require('uuid/v1');
 
 export const WebRTCConstants = KeyMirror({
   WEB_RTC_ON_LOCAL_AUDIO: null,
@@ -18,8 +19,8 @@ export const WebRTCConstants = KeyMirror({
   WEB_RTC_ON_AUDIO_MUTE: null,
   WEB_RTC_ON_VIDEO_MUTE: null,
   WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED: null,
+  WEB_RTC_ON_CHAT_MESSAGE_RECEIVED: null,
 });
-
 
 export function CreateRoomForRoutingIds (routingIds, token, eventManagerUrl, domain) {
   console.log('React SDK :: CreateRoomForRoutingIds');
@@ -210,7 +211,6 @@ export default (ComposedComponent) => {
         isVideoMuted: false,
         localConnectionList: [],
         remoteConnectionList: [],
-        chatMessageHistory: [],
         isSharingScreen: false,
       }
 
@@ -246,6 +246,18 @@ export default (ComposedComponent) => {
         eventManager: hosts.eventManagerUrl,
         notificationManager: hosts.notificationServer,
         UEStatsServer: '',
+        // We get parsing errors from Iris JS SDK if userData isn't stringified
+        userData: JSON.stringify({
+          "data": {
+            "cid": userName,
+            "cname": userName
+          },
+          "notification": {
+            "topic": domain + "/" + 'videocall',
+            "srcTN": '',
+            "type": 'videocall'
+          }
+        }),
       }
       let serverConfig = userConfig;
       console.log("init SDK");
@@ -292,15 +304,18 @@ export default (ComposedComponent) => {
 
     _sendChatMessage(userId, message) {
       console.log('Sending message from ' + userId + ' in _sendChatMessage saying: ' + message);
-      this.state.session.sendChatMessage(message);
+      this.state.session.sendChatMessage(message, uuidV1(), uuidV1());
     }
 
     _onChatMsgReceived(userUrl, message, timestamp) {
       console.log('Received chat message from: ' + userUrl + ' saying: ' + message + ' at: ' + timestamp);
       const routingId = userUrl.substring(0, userUrl.indexOf("@"));
 
-      // add to chat history whenever we receive a message from remote participants
-      this.setState({ chatMessageHistory: this.state.chatMessageHistory.concat([{ routingId: routingId, message: message }]) });
+      if (!timestamp) {
+        timestamp = Date.now();
+      }
+
+      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_CHAT_MESSAGE_RECEIVED, [routingId, message, timestamp]);
     }
 
     _onDominantSpeakerChanged(dominantSpeakerEndpoint) {
@@ -348,8 +363,6 @@ export default (ComposedComponent) => {
     _onConnected() {
       console.log('_onConnected');
 
-      this.setState({ chatMessageHistory: [] });
-
       // create local stream
       this.state.localRtcStream = new this.state.xrtcSDK.Stream();
       const streamConfig = {
@@ -373,7 +386,7 @@ export default (ComposedComponent) => {
       // create session
       let session = new this.state.xrtcSDK.Session();
       session.onSessionError = this._onSessionError.bind(this);
-      session.createSessionWithRoomId(localTracks, this.state.roomId);
+      session.createSession(localTracks, this.state.userConfig);
 
       this.setState({ session: session });
 
@@ -714,7 +727,6 @@ export default (ComposedComponent) => {
           addWebRTCListener={this.eventEmitter.addWebRTCListener.bind(this.eventEmitter)}
           removeWebRTCListener={this.eventEmitter.removeWebRTCListener.bind(this.eventEmitter)}
           sendChatMessage={this._sendChatMessage.bind(this)}
-          chatMessageHistory={this.state.chatMessageHistory}
           startScreenshare={this._startScreenshare.bind(this)}
           endScreenshare={this._endScreenshare.bind(this)}
           isSharingScreen={this.state.isSharingScreen}
