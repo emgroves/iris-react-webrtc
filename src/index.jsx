@@ -266,6 +266,7 @@ export default (ComposedComponent) => {
         this.state.irisRtcSession.onChatMessage = this._onChatMessage.bind(this);
         this.state.irisRtcSession.onError = this._onError.bind(this);
         this.state.irisRtcSession.onEvent = this._onEvent.bind(this);
+        this.state.irisRtcSession.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
 
         IrisRtcConfig.updateConfig(this.state.userConfig);
 
