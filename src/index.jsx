@@ -132,32 +132,11 @@ export let WebRTCEvents = class WebRTCEvents extends EventEmitter {
 export let LocalVideo = class LocalVideo extends React.Component {
   constructor(props) {
     super(props);
-    console.log('in constructor of localVideo');
-    console.log(this.props);
   }
-
-  /*componentDidMount() {
-    if (this.props.video) {
-      this.props.video.track.attach($(this.refs.localVideo)[0]);
-    }
-    if (this.props.audio) {
-      this.props.audio.track.attach($(this.refs.localAudio)[0]);
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.props.video) {
-      this.props.video.track.detach($(this.refs.localVideo)[0]);
-    }
-    if (this.props.audio) {
-      this.props.audio.track.detach($(this.refs.localAudio)[0]);
-    }
-  }*/
 
   render() {
     return <div>
       {this.props.video ? <video ref='localVideo' autoPlay='1' id={'localVideo1'} src={URL.createObjectURL(this.props.video)} /> : null}
-      /*{this.props.audio ? <audio ref='localAudio' autoPlay='1' muted='true' id={'localAudio' + this.props.audio.index} src={this.props.audio.src} /> : null}*/
     </div>
   }
 }
@@ -167,30 +146,9 @@ export let RemoteVideo = class RemoteVideo extends React.Component {
     super(props);
   }
 
-  /*componentDidMount() {
-    if (this.props.video) {
-      this.props.video.track.attach($(this.refs.remoteVideo)[0]);
-    }
-
-    if (this.props.audio) {
-      this.props.audio.track.attach($(this.refs.remoteAudio)[0]);
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.props.video) {
-      this.props.video.track.detach($(this.refs.remoteVideo)[0]);
-    }
-
-    if (this.props.audio) {
-      this.props.audio.track.detach($(this.refs.remoteAudio)[0]);
-    }
-  }*/
-
   render() {
     return <div>
       {this.props.video ? <video ref='remoteVideo' autoPlay="1" id={this.props.video.id} src={URL.createObjectURL(this.props.video)} /> : null}
-      //{this.props.audio ? <audio ref='remoteAudio' autoPlay="1" id={this.props.audio.index} src={this.props.audio.src} /> : null}
     </div>
   }
 }
@@ -206,8 +164,6 @@ export default (ComposedComponent) => {
         irisRtcSession: null,
         irisRtcStream: null,
         userConfig: null,
-        isAudioMuted: false,
-        isVideoMuted: false,
         localConnectionList: [],
         remoteConnectionList: [],
         isSharingScreen: false,
@@ -219,11 +175,12 @@ export default (ComposedComponent) => {
     }
 
     _initializeWebRTC(userName, routingId, roomName, roomId, domain, hosts, token, resolution = '640', allDomain = false, anonymous = false) {
-      console.log('initializeWebRTC -> userName ' + userName);
-      console.log('initializeWebRTC -> routingId ' + routingId);
-      console.log('initializeWebRTC -> roomId ' + roomId);
-      console.log('initializeWebRTC -> domain ' + domain);
-      console.log('initializeWebRTC -> resolution ' + resolution);
+      console.log(`initializeWebRTC -> userName ${userName}`);
+      console.log(`initializeWebRTC -> routingId ${routingId}`);
+      console.log(`initializeWebRTC -> roomId ${roomId}`);
+      console.log(`initializeWebRTC -> roomName ${roomName}`)
+      console.log(`initializeWebRTC -> domain ${domain}`);
+      console.log(`initializeWebRTC -> resolution ${resolution}`);
       console.log(hosts);
 
       const traceId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) { var r = Math.random() * 16 | 0, v = c == 'x' ? r : r & 0x3 | 0x8; return v.toString(16); });
@@ -317,35 +274,6 @@ export default (ComposedComponent) => {
           this.state.userConfig.routingId
         );
       });
-
-
-      /*
-      this.state.irisRtcConn = new xrtcSDK.Connection();
-      this.state.irisRtcConn.onConnectionError = this._onConnectionError.bind(this);
-      this.state.irisRtcConn.connect(userConfig.token, userConfig.routingId);
-
-      if (xrtcSDK != null) {
-        xrtcSDK.onConnected = this._onConnected.bind(this);
-        xrtcSDK.onSessionJoined = this._onSessionJoined.bind(this);
-        xrtcSDK.onSessionEnd = this._onSessionEnd.bind(this);
-        xrtcSDK.onSessionParticipantLeft = this._onSessionParticipantLeft.bind(this);
-        xrtcSDK.onSessionParticipantJoined = this._onSessionParticipantJoined.bind(this);
-        xrtcSDK.onRemoteStream = this._onRemoteStream.bind(this);
-        xrtcSDK.onUserJoined = this._onUserJoined.bind(this);
-        xrtcSDK.onChatMsgReceived = this._onChatMsgReceived.bind(this);
-
-        xrtcSDK.onLocalAudio = this._onLocalAudio.bind(this);
-        xrtcSDK.onLocalVideo = this._onLocalVideo.bind(this);
-        xrtcSDK.onSessionCreated = this._onSessionCreated.bind(this);
-        xrtcSDK.onRemoteParticipantJoined = this._onRemoteParticipantJoined.bind(this);
-        xrtcSDK.onSessionConnected = this._onSessionConnected.bind(this);
-        xrtcSDK.onRemoteVideo = this._onRemoteVideo.bind(this);
-        xrtcSDK.onRemoteParticipantLeft = this._onRemoteParticipantLeft.bind(this);
-
-        xrtcSDK.onConnectionError = this._onConnectionError.bind(this);
-        xrtcSDK.onNotificationReceived = this._onNotificationReceived.bind(this);
-        xrtcSDK.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
-      }*/
     }
 
     _sendChatMessage(userId, message) {
@@ -396,10 +324,6 @@ export default (ComposedComponent) => {
       } else {
         let remoteConnectionList = this.state.remoteConnectionList;
         remoteConnectionList.forEach((item, index, object) => {
-          console.log('ROB ROB');
-          console.log('Object: ', object);
-          console.log('Item: ', item);
-          console.log(`${item.participantJid} includes? ${participantJid}`)
           if (item.participantJid.includes(participantJid)) {
             object.splice(index, 1);
           }
@@ -407,8 +331,6 @@ export default (ComposedComponent) => {
         this.setState({
           remoteConnectionList
         }, () => {
-          console.log('TEST TEST TEST');
-          console.log(remoteConnectionList);
           this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, {
             roomName,
             sessionId,
@@ -447,21 +369,6 @@ export default (ComposedComponent) => {
     _onConnected() {
       console.log('_onConnected');
 
-      // create local stream
-      /*this.state.localRtcStream = new this.state.xrtcSDK.Stream();
-      const streamConfig = {
-        "streamType": "video", // or "audio",
-        "resolution": "hd",// or "sd",
-        "constraints": {
-          audio: true,
-          video: true
-          } // contraints required to create the stream (optional)
-      }
-      const localStream = this.state.localRtcStream.createStream(streamConfig);
-      console.log('localStream:');
-      console.log(localStream);
-      this.state.xrtcSDK.onLocalStream = this._onLocalStream.bind(this);*/
-
       const streamConfig = {
         "streamType": "video", // or "audio",
         "resolution": "hd",// or "sd",
@@ -494,23 +401,11 @@ export default (ComposedComponent) => {
         );
         this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO);
       });
-      /*console.log(localTracks);
-
-      // create session
-      let session = new this.state.xrtcSDK.Session();
-      session.onSessionError = this._onSessionError.bind(this);
-      session.createSession(localTracks, this.state.userConfig);
-
-      this.setState({ session: session });
-
-      // render local track
-      this._onLocalVideo('1234', localTracks);*/
     }
 
     _onRemoteStream(stream) {
       console.log('_onRemoteStream');
       console.log(stream);
-      //this._onRemoteVideo(remoteTracks.sid, remoteTracks);
 
       let remoteConnectionList = this.state.remoteConnectionList;
       remoteConnectionList.push(stream);
@@ -537,48 +432,6 @@ export default (ComposedComponent) => {
       this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_LOCAL_AUDIO);
     }
 
-    /*_onLocalVideo(sessionId, tracks) {
-      console.log('onLocalVideo');
-      console.log(sessionId);
-      console.log(tracks);
-
-      this.localTracks = tracks;
-      let localConnectionList = this.state.localConnectionList;
-      let audioConnection = null;
-      let videoConnection = null;
-
-      for (let i = 0; i < this.localTracks.length; i++) {
-        if (this.localTracks[i].getType() == "video") {
-          //this.localTracks[i].attach("");
-          videoConnection = {
-            index: i,
-            src: this.localTracks[i].stream.jitsiObjectURL,
-            track: this.localTracks[i],
-          }
-        } else {
-          //this.localTracks[i].attach("");
-          audioConnection = {
-            index: i,
-            src: this.localTracks[i].stream.jitsiObjectURL,
-            track: this.localTracks[i],
-          }
-        }
-        //this.state.xrtcSDK.addTrack(this.localTracks[i]);
-      }
-      localConnectionList.push({
-        video: videoConnection,
-        audio: audioConnection,
-      });
-      this.setState({
-        localConnectionList: localConnectionList,
-      }, () => {
-        this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, {
-          sessionId,
-          tracks,
-        });
-      });
-    }*/
-
     _onSessionCreated(roomName, sessionId) {
       console.log('onSessionCreated - session created with ' + sessionId + ' and user joined in ' + roomName);
       this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_SESSION_CREATED, {
@@ -596,96 +449,6 @@ export default (ComposedComponent) => {
       console.log('onSessionConnected');
       this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_SESSION_CONNECTED);
     }
-
-    /*_onRemoteVideo(sessionId, track) {
-      console.log('onRemoteVideo ' + sessionId + ' track ' + track);
-
-      let participant = track.getParticipantId();
-      if (!this.remoteTracks[participant])
-        this.remoteTracks[participant] = [];
-      let idx = this.remoteTracks[participant].push(track);
-      let baseId = participant.replace(/(-.*$)|(@.*$)/, '');
-      let id = baseId + track.getType();
-      console.log('_onRemoteVideo ID: ' + id);
-
-      let remoteConnectionList = this.state.remoteConnectionList;
-      let audioConnection = null;
-      let videoConnection = null;
-
-      // check if the audio or video component for this base track
-      // already exists
-      let existingConnection = _.find(remoteConnectionList, (obj) => {
-        return obj.baseId === baseId;
-      });
-
-      // if it does remove half populated connection and save the audio
-      // or video part to be used with the new connection for this baseId
-      if (existingConnection) {
-        audioConnection = existingConnection.audio;
-        videoConnection = existingConnection.video;
-        remoteConnectionList = _.without(remoteConnectionList, existingConnection);
-      }
-
-      if (track.getType() == "video") {
-        console.log('onRemoteVideo video');
-        videoConnection = {
-          index: id,
-          src: track.stream.jitsiObjectURL,
-          track: track
-        }
-      } else {
-        console.log('onRemoteVideo audio');
-        audioConnection = {
-          index: id,
-          src: track.stream.jitsiObjectURL,
-          track: track
-        }
-      }
-      remoteConnectionList.push({
-        video: videoConnection,
-        audio: audioConnection,
-        baseId: baseId,
-        track: track,
-      });
-      this.setState({
-        remoteConnectionList: remoteConnectionList,
-      }, () => {
-        if (videoConnection && audioConnection) {
-          // notify only when both video and audio is available
-          this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, {
-            sessionId,
-            track,
-          });
-        }
-      });
-    }*/
-
-    /*_onRemoteParticipantLeft(id) {
-      console.log('onRemoteParticipantLeft: ' + id);
-
-      if (!this.remoteTracks[id]) {
-        console.log('NO REMOTE TRACK FOUND')
-        return;
-      }
-
-      let tracks = this.remoteTracks[id];
-      for (let i = 0; i < tracks.length; i++) {
-        let baseId = id.replace(/(-.*$)|(@.*$)/, '');
-        //tracks[i].detach(trackId);
-
-        let remoteConnectionList = this.state.remoteConnectionList;
-        let existingConnection = _.find(remoteConnectionList, (obj) => {
-          return obj.baseId === baseId;
-        });
-
-        remoteConnectionList = _.without(remoteConnectionList, existingConnection);
-        this.setState({
-          remoteConnectionList: remoteConnectionList,
-        });
-      }
-
-      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, id);
-    }*/
 
     _onSessionEnd(sessionId) {
       console.log('onSessionEnded: ' + sessionId);
@@ -706,36 +469,13 @@ export default (ComposedComponent) => {
     }
 
     _onAudioMute() {
-      const isMuted = !this.state.isAudioMuted;
-      this.setState({
-        isAudioMuted: isMuted,
-      }, () => {
-        this.state.localRtcStream.toggleAudioMute(isMuted, (response) => {
-          if (!response) {
-            console.log("Local audio mute/unmute failed");
-            this.setState({
-              isAudioMuted: !this.state.isAudioMuted,
-            });
-          }
-        });
-        this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_AUDIO_MUTE);
-      });
+      this.state.irisRtcSession.audioMuteToggle();
+      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_AUDIO_MUTE);
     }
 
     _onVideoMute() {
-      const isMuted = !this.state.isVideoMuted;
-      this.setState({
-        isVideoMuted: isMuted,
-      }, () => {
-        this.state.localRtcStream.toggleVideoMute(isMuted, (response) => {
-          if (!response) {
-            this.setState({
-              isVideoMuted: !this.state.isVideoMuted,
-            });
-          }
-        });
-        this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_VIDEO_MUTE);
-      });
+      this.state.irisRtcSession.videoMuteToggle();
+      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_VIDEO_MUTE);
     }
 
     get localVideos() {
@@ -744,26 +484,6 @@ export default (ComposedComponent) => {
 
     get remoteVideos() {
       return this.state.remoteConnectionList ? this.state.remoteConnectionList : [];
-    }
-
-    _getRootNodeId() {
-      if (this.state.xrtcSDK &&
-        this.state.xrtcSDK.connection &&
-        this.state.xrtcSDK.connection.options) {
-        return this.state.xrtcSDK.connection.options.eventNodeId;
-      }
-
-      return null;
-    }
-
-    _getRootChildNodeId() {
-      if (this.state.xrtcSDK &&
-        this.state.xrtcSDK.connection &&
-        this.state.xrtcSDK.connection.options) {
-        return this.state.xrtcSDK.connection.options.eventCnodeId;
-      }
-
-      return null;
     }
 
     _startScreenshare(screenSourceId) {
@@ -842,8 +562,6 @@ export default (ComposedComponent) => {
           onVideoMute={this._onVideoMute.bind(this)}
           localVideos={this.localVideos}
           remoteVideos={this.remoteVideos}
-          getRootNodeId={this._getRootNodeId.bind(this)}
-          getRootChildNodeId={this._getRootChildNodeId.bind(this)}
           endSession={this._sessionEnd.bind(this)}
           addWebRTCListener={this.eventEmitter.addWebRTCListener.bind(this.eventEmitter)}
           removeWebRTCListener={this.eventEmitter.removeWebRTCListener.bind(this.eventEmitter)}
