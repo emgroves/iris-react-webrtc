@@ -136,7 +136,7 @@ export let LocalVideo = class LocalVideo extends React.Component {
 
   render() {
     return <div>
-      {this.props.video ? <video ref='localVideo' id={'localVideo1'} src={URL.createObjectURL(this.props.video)} /> : null}
+      {this.props.video ? <video ref='localVideo' autoPlay muted id={'localVideo1'} src={URL.createObjectURL(this.props.video)} /> : null}
     </div>
   }
 }
@@ -148,7 +148,7 @@ export let RemoteVideo = class RemoteVideo extends React.Component {
 
   render() {
     return <div>
-      {this.props.video ? <video ref='remoteVideo' id={this.props.video.id} src={URL.createObjectURL(this.props.video)} /> : null}
+      {this.props.video ? <video ref='remoteVideo' autoPlay id={this.props.video.id} src={URL.createObjectURL(this.props.video)} /> : null}
     </div>
   }
 }
