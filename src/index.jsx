@@ -136,7 +136,7 @@ export let LocalVideo = class LocalVideo extends React.Component {
 
   render() {
     return <div>
-      {this.props.video ? <video ref='localVideo' autoPlay='1' id={'localVideo1'} src={URL.createObjectURL(this.props.video)} /> : null}
+      {this.props.video ? <video ref='localVideo' id={'localVideo1'} src={URL.createObjectURL(this.props.video)} /> : null}
     </div>
   }
 }
@@ -148,7 +148,7 @@ export let RemoteVideo = class RemoteVideo extends React.Component {
 
   render() {
     return <div>
-      {this.props.video ? <video ref='remoteVideo' autoPlay="1" id={this.props.video.id} src={URL.createObjectURL(this.props.video)} /> : null}
+      {this.props.video ? <video ref='remoteVideo' id={this.props.video.id} src={URL.createObjectURL(this.props.video)} /> : null}
     </div>
   }
 }
@@ -174,7 +174,7 @@ export default (ComposedComponent) => {
       this.eventEmitter = new WebRTCEvents();
     }
 
-    _initializeWebRTC(userName, routingId, roomName, roomId, domain, hosts, token, resolution = '640', allDomain = false, anonymous = false) {
+    _initializeWebRTC(userName, routingId, roomName, roomId, domain, hosts, token, resolution = 'hd', allDomain = false, anonymous = false) {
       console.log(`initializeWebRTC -> userName ${userName}`);
       console.log(`initializeWebRTC -> routingId ${routingId}`);
       console.log(`initializeWebRTC -> roomId ${roomId}`);
@@ -371,8 +371,8 @@ export default (ComposedComponent) => {
       console.log('_onConnected');
 
       const streamConfig = {
-        "streamType": "video", // or "audio",
-        "resolution": "hd",// or "sd",
+        "streamType": "video",
+        "resolution": this.state.userConfig.resolution,
         "constraints": {
           audio: true,
           video: true
@@ -391,10 +391,6 @@ export default (ComposedComponent) => {
       this.setState({
         localConnectionList
       }, () => {
-        /*this.state.irisRtcSession.createSession(
-          stream,
-          this.state.userConfig
-        );*/
         this.state.irisRtcSession.createSession(
           this.state.userConfig,
           this.state.irisRtcConnection,
@@ -537,8 +533,8 @@ export default (ComposedComponent) => {
       })
         .then(() => {
           const streamConfig = {
-            "streamType": "video", // or "audio",
-            "resolution": "hd",// or "sd",
+            "streamType": "video",
+            "resolution": this.state.userConfig.resolution,
             "constraints": {
               audio: true,
               video: true
@@ -558,7 +554,7 @@ export default (ComposedComponent) => {
           {...this.props}
           params={this.props.params}
           initializeWebRTC={this._initializeWebRTC.bind(this)}
-          isWebRTCInitialized={(this.state.xrtcSDK !== undefined && this.state.xrtcSDK !== null)}
+          isWebRTCInitialized={(this.state.irisRtcSession && this.state.irisRtcStream && this.state.irisRtcConnection)}
           onAudioMute={this._onAudioMute.bind(this)}
           onVideoMute={this._onVideoMute.bind(this)}
           localVideos={this.localVideos}
