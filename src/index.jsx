@@ -134,9 +134,13 @@ export let LocalVideo = class LocalVideo extends React.Component {
     super(props);
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return false
+  }
+
   render() {
     return <div>
-      {this.props.video ? <video ref='localVideo' autoPlay muted id={'localVideo1'} src={URL.createObjectURL(this.props.video)} /> : null}
+      <video ref='localVideo' autoPlay muted id={'localVideo1'} src={this.props.video ? URL.createObjectURL(this.props.video) : ''} />
     </div>
   }
 }
@@ -146,9 +150,13 @@ export let RemoteVideo = class RemoteVideo extends React.Component {
     super(props);
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return false
+  }
+
   render() {
     return <div>
-      {this.props.video ? <video ref='remoteVideo' autoPlay id={this.props.video.id} src={URL.createObjectURL(this.props.video)} /> : null}
+      <video ref='remoteVideo' autoPlay id={this.props.video.id} src={this.props.video ? URL.createObjectURL(this.props.video) : ''} />
     </div>
   }
 }
