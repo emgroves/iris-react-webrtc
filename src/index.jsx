@@ -209,11 +209,14 @@ export default (ComposedComponent) => {
         loginType: 'connect',
         type: 'video',
         useBridge: true,
-        stream: 'sendonly',
+        //stream: 'sendonly',
         resolution: resolution,
         eventManager: hosts.eventManagerUrl,
         notificationManager: hosts.notificationServer,
         UEStatsServer: '',
+        urls : {
+          eventManager: hosts.eventManagerUrl,
+        },
         // We get parsing errors from Iris JS SDK if userData isn't stringified
         userData: JSON.stringify({
           "data": {
@@ -399,11 +402,13 @@ export default (ComposedComponent) => {
       this.setState({
         localConnectionList
       }, () => {
-        this.state.irisRtcSession.createSession(
-          this.state.userConfig,
-          this.state.irisRtcConnection,
-          stream
-        );
+        if (!this.state.isSharingScreen) {
+          this.state.irisRtcSession.createSession(
+            this.state.userConfig,
+            this.state.irisRtcConnection,
+            stream
+          );
+        }
         this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO);
       });
     }
@@ -502,20 +507,30 @@ export default (ComposedComponent) => {
 
       const screenShareConfig = {
         constraints: {
-          audio: false,
-          video: {
+          audio: {
+              mandatory: {
+                chromeMediaSource: "desktop",
+                chromeMediaSourceId: screenSourceId
+              }
 
+          },
+          video: {
             mandatory: {
               chromeMediaSource: "desktop",
-              chromeMediaSourceId: event.data.sourceId
-            }
-          }
+              chromeMediaSourceId: screenSourceId,
+              maxWidth: 1920,
+              maxHeight: 1080
+            },
+            optional: [{
+              googTemporalLayeredScreencast: true
+            }]
+          },
         }
       };
 
       this.setState({ isSharingScreen: true }, () => {
         console.log('----> screenShareConfig: ' + JSON.stringify(screenShareConfig));
-        this.state.session.switchStream(screenShareConfig);
+        this.state.irisRtcSession.switchStream(this.state.irisRtcStream, screenShareConfig);
         console.log(this.state.session.session.peerconnection);
         console.log(this.state.session.session.connection.xmpp.getSessions());
       });
