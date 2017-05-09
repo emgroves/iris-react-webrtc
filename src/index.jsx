@@ -531,8 +531,8 @@ export default (ComposedComponent) => {
       this.setState({ isSharingScreen: true }, () => {
         console.log('----> screenShareConfig: ' + JSON.stringify(screenShareConfig));
         this.state.irisRtcSession.switchStream(this.state.irisRtcStream, screenShareConfig);
-        console.log(this.state.session.session.peerconnection);
-        console.log(this.state.session.session.connection.xmpp.getSessions());
+        console.log("Peer connection: ", this.state.irisRtcSession.peerconnection);
+        console.log("Connection.xmpp: ", this.state.irisRtcSession.connection.xmpp);
       });
     }
 
@@ -565,7 +565,7 @@ export default (ComposedComponent) => {
           };
 
           this.setState({ isSharingScreen: false }, () => {
-            this.state.session.switchStream(streamConfig);
+            this.state.irisRtcSession.switchStream(this.state.irisRtcStream, screenShareConfig);
           });
         })
         .catch((error) => console.error('ERROR: ' + error));
