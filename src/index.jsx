@@ -267,6 +267,7 @@ export default (ComposedComponent) => {
 
         // TODO: handler needs update
         this.state.irisRtcStream.onLocalStream = this._onLocalStream.bind(this);
+        this.state.irisRtcStream.irisVideoStreamStopped = this._onStreamStopped.bind(this)
 
         this.state.irisRtcSession.onRemoteStream = this._onRemoteStream.bind(this);
         this.state.irisRtcSession.onSessionCreated = this._onSessionCreated.bind(this);
@@ -411,6 +412,14 @@ export default (ComposedComponent) => {
         }
         this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO);
       });
+    }
+
+
+    _onStreamStopped() {
+      //this probably needs some checks. Because stop of stream doesn't
+      //necessarily imply that the screen share ended. Could've been something
+      //else.
+      this._endScreenshare()
     }
 
     _onRemoteStream(stream) {
