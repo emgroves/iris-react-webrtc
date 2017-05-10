@@ -546,7 +546,8 @@ export default (ComposedComponent) => {
           const screenshareConnection = localConnectionList.pop();
           // stop the tracks so that the browser knows we're done sharing the screen
           // if we don't do this, chrome's screenshare bar won't close
-          screenshareConnection.video.track.stream.getTracks().map((track) => {
+          //screenshareConnection.video.track.stream.getTracks().map((track) => {
+          screenshareConnection.getVideoTracks().map(function (track) {
             if (track.stop) {
               track.stop();
             }
@@ -565,7 +566,7 @@ export default (ComposedComponent) => {
           };
 
           this.setState({ isSharingScreen: false }, () => {
-            this.state.irisRtcSession.switchStream(this.state.irisRtcStream, screenShareConfig);
+            this.state.irisRtcSession.switchStream(this.state.irisRtcStream, streamConfig);
           });
         })
         .catch((error) => console.error('ERROR: ' + error));
