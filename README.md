@@ -11,7 +11,7 @@ npm install iris-react-webrtc
 or it can be included from webpage from following cdn:
 
 ```
-https://npmcdn.com/iris-react-webrtc@0.0.19/dist/iris.react.webrtc.min.js
+https://unpkg.com/iris-react-webrtc@0.0.19/dist/iris.react.webrtc.min.js
 ```
 
 ## Components
@@ -26,7 +26,7 @@ Package provides following components that can be used to create WebRTC audio/vi
 To initialize WebRTC library make the following call:
 
 ```
-this.props.initializeWebRTC(userName, routingId, roomId, domain, hosts, token, resolution, allDomain);
+this.props.initializeWebRTC(userName, routingId, roomName, roomId, domain, hosts, token, resolution, allDomain);
 ```
 
 * userName - any string
@@ -53,10 +53,10 @@ class Chat extends React.Component {
     return (
       <div>
         {this.props.localVideos.map((connection) => {
-          return <LocalVideo key={connection.video.index} video={connection.video} audio={connection.audio} />
+          return <LocalVideo key={connection.id} video={connection} />
         })}
         {this.props.remoteVideos.map((connection) => {
-          return <RemoteVideo key={connection.video.index} video={connection.video} audio={connection.audio} />
+          return <RemoteVideo key={connection.id} video={connection} />
         })}
       </div>
     );
