@@ -399,11 +399,11 @@ export default (ComposedComponent) => {
       console.log(stream);
 
       let localConnectionList = this.state.localConnectionList;
-      console.log("Before: ", localConnectionList)
+
       localConnectionList = localConnectionList.filter(function(connection) {
         return connection.id !== stream.id;
       });
-      console.log("After: ", remoteConnectionList)
+
       localConnectionList.push(stream);
       this.setState({
         localConnectionList
@@ -432,11 +432,11 @@ export default (ComposedComponent) => {
       console.log(stream);
 
       let remoteConnectionList = this.state.remoteConnectionList;
-      console.log("Before: ", remoteConnectionList)
+      
       remoteConnectionList = remoteConnectionList.filter(function(connection) {
         return connection.participantJid !== stream.participantJid;
       });
-      console.log("After: ", remoteConnectionList)
+
       remoteConnectionList.push(stream);
       this.setState({
         remoteConnectionList
