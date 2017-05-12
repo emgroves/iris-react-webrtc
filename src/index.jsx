@@ -399,6 +399,11 @@ export default (ComposedComponent) => {
       console.log(stream);
 
       let localConnectionList = this.state.localConnectionList;
+
+      localConnectionList = localConnectionList.filter(function(connection) {
+        return connection.id !== stream.id;
+      });
+
       localConnectionList.push(stream);
       this.setState({
         localConnectionList
@@ -427,6 +432,11 @@ export default (ComposedComponent) => {
       console.log(stream);
 
       let remoteConnectionList = this.state.remoteConnectionList;
+      
+      remoteConnectionList = remoteConnectionList.filter(function(connection) {
+        return connection.participantJid !== stream.participantJid;
+      });
+
       remoteConnectionList.push(stream);
       this.setState({
         remoteConnectionList
