@@ -20,6 +20,7 @@ export const WebRTCConstants = KeyMirror({
   WEB_RTC_ON_VIDEO_MUTE: null,
   WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED: null,
   WEB_RTC_ON_CHAT_MESSAGE_RECEIVED: null,
+  WEB_RTC_ON_REMOTE_SWITCH_STREAM: null //!!!
 });
 
 export function CreateRoomForRoutingIds (routingIds, token, eventManagerUrl, domain) {
@@ -135,6 +136,7 @@ export let LocalVideo = class LocalVideo extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    console.log("shouldComponentUpdate local")
     return false
   }
 
@@ -151,7 +153,14 @@ export let RemoteVideo = class RemoteVideo extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return false
+
+      if (nextProps.video && this.props.video) {
+        if (nextProps.video.id !== this.props.video.id) {
+          return true
+        }
+      }
+
+      return false
   }
 
   render() {
@@ -424,6 +433,8 @@ export default (ComposedComponent) => {
       //this probably needs some checks. Because stop of stream doesn't
       //necessarily imply that the screen share ended. Could've been something
       //else.
+      //Although the endscreenshare function is not specific to sharing screen,
+      //so this is more of a naming pattern issue than a bug
       this._endScreenshare()
     }
 
@@ -432,7 +443,12 @@ export default (ComposedComponent) => {
       console.log(stream);
 
       let remoteConnectionList = this.state.remoteConnectionList;
-      
+
+      //check if the remote participant retained the same Jid but got a new ID
+      let oldIDStream = remoteConnectionList.find(function(connection) {
+        return (connection.participantJid === stream.participantJid && connection.id !== stream.id)
+      })
+
       remoteConnectionList = remoteConnectionList.filter(function(connection) {
         return connection.participantJid !== stream.participantJid;
       });
@@ -442,6 +458,15 @@ export default (ComposedComponent) => {
         remoteConnectionList
       }, () => {
         this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO);
+        // emit event with old and new id's
+        let newID = stream.id
+        if (oldIDStream && newID) {
+          let oldID = oldIDStream.id
+          this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_REMOTE_SWITCH_STREAM, {
+            oldID,
+            newID,
+          });
+        }
       });
     }
 
