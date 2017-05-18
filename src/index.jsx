@@ -569,7 +569,8 @@ export default (ComposedComponent) => {
               googTemporalLayeredScreencast: true
             }]
           },
-        }
+        },
+        screenShare: true
       };
 
       this.setState({ isSharingScreen: true }, () => {
