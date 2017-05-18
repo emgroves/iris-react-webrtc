@@ -5,6 +5,8 @@ import { EventEmitter } from 'events';
 const request = require('request-promise-native');
 const uuidV1 = require('uuid/v1');
 
+export { default as Dialer } from './dialer/DialerContainer';
+
 export const WebRTCConstants = KeyMirror({
   WEB_RTC_ON_LOCAL_AUDIO: null,
   WEB_RTC_ON_LOCAL_VIDEO: null,
@@ -129,6 +131,8 @@ export let WebRTCEvents = class WebRTCEvents extends EventEmitter {
     this.removeListener(eventType, callback);
   }
 }
+
+
 
 export let LocalVideo = class LocalVideo extends React.Component {
   constructor(props) {
@@ -300,7 +304,7 @@ export default (ComposedComponent) => {
 
     _sendChatMessage(userId, message) {
       console.log('Sending message from ' + userId + ' in _sendChatMessage saying: ' + message);
-      this.state.session.sendChatMessage(message, uuidV1(), uuidV1());
+      this.state.irisRtcSession.sendChatMessage(message, uuidV1(), uuidV1());
     }
 
     _onChatMessage(from, to, txt) {
@@ -321,7 +325,7 @@ export default (ComposedComponent) => {
           t.dispose();
         });
 
-        this.state.session.endSession();
+        this.state.irisRtcSession.endSession();
         this.setState({ localRtcStream: null, localConnectionList: [], remoteConnectionList: [] });
       }
     }
