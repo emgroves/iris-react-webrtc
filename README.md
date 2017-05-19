@@ -68,7 +68,7 @@ export default withWebRTC(Chat);
 
 The above code also shows how you would display LocalVideo and RemoteVideo as well as install handlers for audio/video mute buttons.  withWebRTC provides functions and properties in this.props of your components.  They are listed in the section below.  localVideos and remoteVideos are lists of the available audio/video streams that can be displayed by the application. Iris React WebRTC library provides LocalVideo and RemoteVideo components to simplify the addition of video/audio as demonstrated in the snippet above.  
 
-To see example of this code look at the file src/components/main.jsx in reference application.
+To see example of this code look at the file src/components/main.js in reference application.
 
 ## Available API Functions
 * initializeWebRTC - intialize WebRTC library
