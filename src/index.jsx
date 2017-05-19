@@ -2,6 +2,7 @@ import React from 'react';
 import _ from 'underscore';
 import KeyMirror from 'keymirror'
 import { EventEmitter } from 'events';
+require('iris-js-sdk');
 const request = require('request-promise-native');
 const uuidV1 = require('uuid/v1');
 
