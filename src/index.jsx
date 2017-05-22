@@ -413,12 +413,12 @@ export default (ComposedComponent) => {
       console.log(stream);
 
       let localConnectionList = this.state.localConnectionList;
-
-      localConnectionList = localConnectionList.filter(function(connection) {
-        return connection.id !== stream.id;
-      });
-
       localConnectionList.push(stream);
+
+      if (localConnectionList.length === 2) {
+        localConnectionList.pop()
+      }
+      
       this.setState({
         localConnectionList
       }, () => {
