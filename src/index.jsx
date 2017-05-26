@@ -308,8 +308,8 @@ export default (ComposedComponent) => {
       this.state.irisRtcSession.sendChatMessage(message, uuidV1(), uuidV1());
     }
 
-    _onChatMessage(from, to, txt) {
-      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_CHAT_MESSAGE_RECEIVED, {from, to, txt});
+    _onChatMessage(message, from) {
+      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_CHAT_MESSAGE_RECEIVED, {message: message, from: from});
     }
 
     _onDominantSpeakerChanged(dominantSpeakerEndpoint) {
@@ -319,15 +319,9 @@ export default (ComposedComponent) => {
 
     _sessionEnd() {
       console.log('_sessionEnd');
-      if (this.state.xrtcSDK) {
-        const tracks = this.state.localRtcStream.getLocalTracks();
-
-        tracks.forEach((t) => {
-          t.dispose();
-        });
-
+      if (this.state.irisRtcSession) {
         this.state.irisRtcSession.endSession();
-        this.setState({ localRtcStream: null, localConnectionList: [], remoteConnectionList: [] });
+        this.setState({ irisRtcStream: null, localConnectionList: [], remoteConnectionList: [] });
       }
     }
 
