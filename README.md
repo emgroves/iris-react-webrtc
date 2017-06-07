@@ -25,8 +25,26 @@ Package provides following components that can be used to create WebRTC audio/vi
 ## Initialization
 To initialize WebRTC library make the following call:
 
-```
-this.props.initializeWebRTC(userName, routingId, roomName, roomId, domain, hosts, token, resolution, allDomain);
+```javascript
+
+let config = {
+  userName    : userName,
+  routingId   : routingId,
+  roomName    : roomName,
+  roomId      : roomId,
+  domain      : domain,
+  hosts       : hosts,
+  token       : token,
+  resolution  : resolution,
+  streamType  : streamType,
+  type        : type,
+  isPSTN      : isPSTN,
+  fromTN      : fromTN,
+  toTN        : toTN,
+}
+
+this.props.initializeWebRTC(config);
+
 ```
 
 * userName - any string
@@ -35,8 +53,12 @@ this.props.initializeWebRTC(userName, routingId, roomName, roomId, domain, hosts
 * domain - this is your application domain name.  This is your application name in lowercase as you defined it in Iris Auth Portal.  You can also get this value programmatically after successful login using Iris Auth JS SDK.  To do it you can call decodeToken(token) function.  For example usage look at the reference app file src/stores/user-store.jsx.
 * hosts - urls for event manager and notification manager: { eventManagerUrl: Config.eventManagerUrl, notificationServer: Config.notificationServer }
 * token - token received via authentication
-* requestedResolution - one of the valid resolutions: 1080, fullhd, 720', hd, 960, 360, 640, vga, 180, 320
-* allDomain - this true if no participants are specified in the room (anonymous), otherwise false
+* resolution - one of the valid resolutions: 1080, fullhd, 720', hd, 960, 360, 640, vga, 180, 320
+* type - This is call type, "video" or "audio" or "pstn"
+* streamType - Audio or video local stream to be created. streamType should be either "video" or "audio"
+* isPSTN - A boolean value. true if it is a PSTN call.
+* fromTN - Telephone number of the caller
+* toTN - Telephone number of the callee
 
 ## Usage
 Import package into your component with the following statement:
@@ -72,6 +94,7 @@ To see example of this code look at the file src/components/main.js in reference
 
 ## Available API Functions
 * initializeWebRTC - intialize WebRTC library
+* createSession - create iris session
 * onAudioMute - call this function to mute audio
 * onVideoMute - call this function to mute video
 * localVideos - list of local audio/video tracks
