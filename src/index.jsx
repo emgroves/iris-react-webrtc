@@ -6,7 +6,7 @@ require('iris-js-sdk');
 const request = require('request-promise-native');
 const uuidV1 = require('uuid/v1');
 
-export { default as Dialer } from './dialer/DialerContainer';
+export { default as IrisDialer } from './iris-dialer/components/IrisDialer';
 
 export const WebRTCConstants = KeyMirror({
   WEB_RTC_ON_LOCAL_AUDIO: null,
@@ -107,54 +107,66 @@ export default (ComposedComponent) => {
       this.eventEmitter = new WebRTCEvents();
     }
 
-    _initializeWebRTC(userName, routingId, roomName, roomId, domain, hosts, token, resolution = 'hd', allDomain = false, anonymous = false) {
-      console.log(`initializeWebRTC -> userName ${userName}`);
-      console.log(`initializeWebRTC -> routingId ${routingId}`);
-      console.log(`initializeWebRTC -> roomId ${roomId}`);
-      console.log(`initializeWebRTC -> roomName ${roomName}`)
-      console.log(`initializeWebRTC -> domain ${domain}`);
-      console.log(`initializeWebRTC -> resolution ${resolution}`);
+    _initializeWebRTC(config) {
+
+      console.log(`initializeWebRTC -> userName ${config.userName}`);
+      console.log(`initializeWebRTC -> routingId ${config.routingId}`);
+      console.log(`initializeWebRTC -> roomId ${config.roomId}`);
+      console.log(`initializeWebRTC -> roomName ${config.roomName}`)
+      console.log(`initializeWebRTC -> domain ${config.domain}`);
+      console.log(`initializeWebRTC -> resolution ${config.resolution}`);
       console.log(hosts);
 
       const traceId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) { var r = Math.random() * 16 | 0, v = c == 'x' ? r : r & 0x3 | 0x8; return v.toString(16); });
       let userConfig = {
-        jid: userName,
+        jid: config.userName,
         password: '',
-        roomId: roomId,
-        roomName: roomName,
-        domain: domain,
-        token: token,
-        routingId: routingId + '@' + domain,
-        anonymous: anonymous,
+        roomId: config.roomId,
+        roomName: config.roomName,
+        domain: config.domain,
+        token: config.token,
+        routingId: config.routingId + '@' + config.domain,
+        anonymous: config.anonymous ? config.anonymous : false,
         traceId: traceId,
-        useSecureAPI: true,
-        allDomain: allDomain,
-        useEventManager: true,
         callType: 'video',
         loginType: 'connect',
-        type: 'video',
+        type: config.type ? config.type : "video",
+        streamType:config.streamType ? config.streamType : "video",
         useBridge: true,
         //stream: 'sendonly',
-        resolution: resolution,
-        eventManager: hosts.eventManagerUrl,
-        notificationManager: hosts.notificationServer,
+        resolution: config.resolution ? config.resolution : "hd",
+        eventManager: config.hosts.eventManagerUrl,
+        notificationManager: config.hosts.notificationServer,
         UEStatsServer: '',
         urls : {
-          eventManager: hosts.eventManagerUrl,
+          eventManager: config.hosts.eventManagerUrl,
         },
         // We get parsing errors from Iris JS SDK if userData isn't stringified
+
+      }
+      let userData = "";
+      if(config.isPSTN){
         userData: JSON.stringify({
           "data": {
-            "cid": userName,
-            "cname": userName
+            "cid": config.userName,
+            "cname": config.userName
+          }
+        })
+      }else{
+        userData: JSON.stringify({
+          "data": {
+            "cid": config.userName,
+            "cname": config.userName
           },
           "notification": {
-            "topic": domain + "/" + 'videocall',
+            "topic": config.domain + "/" + 'videocall',
             "srcTN": '',
             "type": 'videocall'
           }
-        }),
+        })
       }
+
+      userConfig.userData = userData;
       let serverConfig = userConfig;
       console.log("init SDK");
       console.log(userConfig);
@@ -178,7 +190,7 @@ export default (ComposedComponent) => {
 
       this.setState({
         userConfig: userConfig,
-        roomId: roomId,
+        roomId: config.roomId,
         irisRtcConnection: connection,
         irisRtcSession: session,
         irisRtcStream: stream,
@@ -212,6 +224,24 @@ export default (ComposedComponent) => {
           this.state.userConfig.routingId
         );
       });
+    }
+
+    _createSession(){
+      this.state.irisRtcSession.createSession(
+        this.state.userConfig,
+        this.state.irisRtcConnection,
+        this.state.localConnectionList[0]
+      );
+    }
+
+     //To createStream in case of non-anonymous incoming calls or notification based calls
+    _createStream(streamConfig){
+      let userConfig = this.state.userConfig;
+      userConfig.streamConfig = streamConfig;
+
+      this.setState(userConfig:userConfig);
+
+      this.state.irisRtcStream.createStream(streamConfig);
     }
 
     _sendChatMessage(userId, message) {
@@ -302,7 +332,7 @@ export default (ComposedComponent) => {
       console.log('_onConnected');
 
       const streamConfig = {
-        "streamType": "video",
+        "streamType": this.state.userConfig.streamType,
         "resolution": this.state.userConfig.resolution,
         "constraints": {
           audio: true,
@@ -323,11 +353,11 @@ export default (ComposedComponent) => {
       if (localConnectionList.length === 2) {
         localConnectionList.pop()
       }
-      
+
       this.setState({
         localConnectionList
       }, () => {
-        if (!this.state.isSharingScreen) {
+        if (!this.state.isSharingScreen || userConfig.anonymous) {
           this.state.irisRtcSession.createSession(
             this.state.userConfig,
             this.state.irisRtcConnection,
@@ -533,6 +563,7 @@ export default (ComposedComponent) => {
           {...this.props}
           params={this.props.params}
           initializeWebRTC={this._initializeWebRTC.bind(this)}
+          createSession={this._createSession.bind(this)}
           isWebRTCInitialized={(this.state.irisRtcSession && this.state.irisRtcStream && this.state.irisRtcConnection)}
           onAudioMute={this._onAudioMute.bind(this)}
           onVideoMute={this._onVideoMute.bind(this)}
