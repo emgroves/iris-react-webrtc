@@ -357,7 +357,7 @@ export default (ComposedComponent) => {
       this.setState({
         localConnectionList
       }, () => {
-        if (!this.state.isSharingScreen || userConfig.anonymous) {
+        if (!this.state.isSharingScreen || this.state.userConfig.anonymous) {
           this.state.irisRtcSession.createSession(
             this.state.userConfig,
             this.state.irisRtcConnection,
