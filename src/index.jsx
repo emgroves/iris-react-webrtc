@@ -115,7 +115,7 @@ export default (ComposedComponent) => {
       console.log(`initializeWebRTC -> roomName ${config.roomName}`)
       console.log(`initializeWebRTC -> domain ${config.domain}`);
       console.log(`initializeWebRTC -> resolution ${config.resolution}`);
-      console.log(hosts);
+      console.log(config.hosts);
 
       const traceId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) { var r = Math.random() * 16 | 0, v = c == 'x' ? r : r & 0x3 | 0x8; return v.toString(16); });
       let userConfig = {
@@ -141,8 +141,8 @@ export default (ComposedComponent) => {
         urls : {
           eventManager: config.hosts.eventManagerUrl,
         },
+        videoCodec: config.videoCodec ? config.videoCodec : "h264",
         // We get parsing errors from Iris JS SDK if userData isn't stringified
-
       }
       let userData = "";
       if(config.isPSTN){
