@@ -28,7 +28,7 @@ To initialize WebRTC library make the following call:
 ```javascript
 
 let config = {
-  userName    : userName,
+  name        : userName,
   routingId   : routingId,
   roomName    : roomName,
   roomId      : roomId,
@@ -41,6 +41,7 @@ let config = {
   isPSTN      : isPSTN,
   fromTN      : fromTN,
   toTN        : toTN,
+  videoCodec  : videoCodec
 }
 
 this.props.initializeWebRTC(config);
@@ -59,6 +60,7 @@ this.props.initializeWebRTC(config);
 * isPSTN - A boolean value. true if it is a PSTN call.
 * fromTN - Telephone number of the caller
 * toTN - Telephone number of the callee
+* videoCodec - Video codec for the video, default codec is h264
 
 ## Usage
 Import package into your component with the following statement:
@@ -99,6 +101,8 @@ To see example of this code look at the file src/components/main.js in reference
 * onVideoMute - call this function to mute video
 * localVideos - list of local audio/video tracks
 * remoteVideos - list of remote audio/video tracks
+* sendChatMessage - to send chat messages to participant
+* setDisplayName - to set display name
 * endSession - call to end WebRTC session
 * addWebRTCListener - add listener for the given event type (see section below for list of available events)
 * removeWebRTCListener - remove event listener that was previously installed with the above call
@@ -117,3 +121,8 @@ This is the list of available events and their constants that can be passed to a
 * onConnectionError - WEB_RTC_ON_CONNECTION_ERROR
 * onNotificationReceived - WEB_RTC_ON_NOTIFICATION_RECEIVED
 * onDominantSpeakerChanged - WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED
+* onChatMessage - WEB_RTC_ON_CHAT_MESSAGE_RECEIVED
+* onChatAck - WEB_RTC_ON_CHAT_ACK_RECEIVED
+* onParticipantVideoMuted - WEB_RTC_ON_PARTICIPANT_VIDEO_MUTED
+* onParticipantAudioMuted  - WEB_RTC_ON_PARTICIPANT_AUDIO_MUTED
+* onUserProfileChange  - WEB_RTC_ON_USER_PROFILE_CHANGE

@@ -36,7 +36,7 @@
   "license": "MIT",
   "homepage": "https://github.com/iris-platform/iris-react-webrtc",
   "dependencies": {
-    "iris-js-sdk": "3.3.0",
+    "iris-js-sdk": "3.3.2",
     "keymirror": "^0.1.1",
     "react": "^15.3.0",
     "react-dom": "^15.3.0",
