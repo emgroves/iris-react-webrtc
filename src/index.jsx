@@ -23,7 +23,11 @@ export const WebRTCConstants = KeyMirror({
   WEB_RTC_ON_VIDEO_MUTE: null,
   WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED: null,
   WEB_RTC_ON_CHAT_MESSAGE_RECEIVED: null,
-  WEB_RTC_ON_REMOTE_SWITCH_STREAM: null //!!!
+  WEB_RTC_ON_REMOTE_SWITCH_STREAM: null,
+  WEB_RTC_ON_CHAT_ACK_RECEIVED:null,
+  WEB_RTC_ON_PARTICIPANT_VIDEO_MUTED:null,
+  WEB_RTC_ON_PARTICIPANT_AUDIO_MUTED:null,
+  WEB_RTC_ON_USER_PROFILE_CHANGE:null //!!!
 });
 
 export let WebRTCEvents = class WebRTCEvents extends EventEmitter {
@@ -119,7 +123,7 @@ export default (ComposedComponent) => {
 
       const traceId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) { var r = Math.random() * 16 | 0, v = c == 'x' ? r : r & 0x3 | 0x8; return v.toString(16); });
       let userConfig = {
-        jid: config.userName,
+        name:config.userName,
         password: '',
         roomId: config.roomId,
         roomName: config.roomName,
@@ -213,6 +217,10 @@ export default (ComposedComponent) => {
         this.state.irisRtcSession.onSessionParticipantLeft = this._onSessionParticipantLeft.bind(this);
         this.state.irisRtcSession.onSessionEnd = this._onSessionEnd.bind(this);
         this.state.irisRtcSession.onChatMessage = this._onChatMessage.bind(this);
+        this.state.irisRtcSession.onChatAck = this._onChatAck.bind(this);
+        this.state.irisRtcSession.onParticipantVideoMuted = this._onParticipantVideoMuted.bind(this);
+        this.state.irisRtcSession.onParticipantAudioMuted = this._onParticipantAudioMuted.bind(this);
+        this.state.irisRtcSession.onUserProfileChange = this._onUserProfileChange.bind(this);
         this.state.irisRtcSession.onError = this._onError.bind(this);
         this.state.irisRtcSession.onEvent = this._onEvent.bind(this);
         this.state.irisRtcSession.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
@@ -246,11 +254,37 @@ export default (ComposedComponent) => {
 
     _sendChatMessage(userId, message) {
       console.log('Sending message from ' + userId + ' in _sendChatMessage saying: ' + message);
-      this.state.irisRtcSession.sendChatMessage(message, uuidV1(), uuidV1());
+      this.state.irisRtcSession.sendChatMessage(uuidV1(), message);
     }
 
-    _onChatMessage(message, from) {
-      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_CHAT_MESSAGE_RECEIVED, {message: message, from: from});
+    _setDisplayName(name){
+      console.log('Set display name to '+name);
+      this.state.irisRtcSession.setDisplayName(name);
+    }
+
+    _onChatMessage(chatMsgJson) {
+      console.log('_onChatMessage' + 'message json ' + chatMsgJson);
+      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_CHAT_MESSAGE_RECEIVED, chatMsgJson);
+    }
+
+    _onChatAck(chatAckJson){
+      console.log('_onChatAck' + 'ack ' + chatAckJson);
+      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_CHAT_ACK_RECEIVED, chatAckJson);
+    }
+
+    _onParticipantVideoMuted(jid, mute){
+      console.log('_onParticipantVideoMuted' + jid + ' muted ' + mute);
+      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_PARTICIPANT_VIDEO_MUTED, {jid:jid, muted:mute});
+    }
+
+    _onParticipantAudioMuted(jid, mute){
+      console.log('_onParticipantAudioMuted' + jid + ' muted ' + mute);
+      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_PARTICIPANT_AUDIO_MUTED, {jid:jid, muted:mute});
+    }
+
+    _onUserProfileChange(id, profileJson){
+      console.log('_onUserProfileChange' + id + ' profileJson ' + profileJson);
+      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_USER_PROFILE_CHANGE, profileJson);
     }
 
     _onDominantSpeakerChanged(dominantSpeakerEndpoint) {
@@ -426,11 +460,12 @@ export default (ComposedComponent) => {
       this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_LOCAL_AUDIO);
     }
 
-    _onSessionCreated(roomName, sessionId) {
-      console.log('onSessionCreated - session created with ' + sessionId + ' and user joined in ' + roomName);
+    _onSessionCreated(roomName, sessionId, myJid) {
+      console.log('onSessionCreated - session created with ' + sessionId + ' and user joined in ' + roomName + ' myJid ' + myJid);
       this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_SESSION_CREATED, {
         sessionId,
         roomName,
+        myJid
       });
     }
 
@@ -576,6 +611,7 @@ export default (ComposedComponent) => {
           startScreenshare={this._startScreenshare.bind(this)}
           endScreenshare={this._endScreenshare.bind(this)}
           isSharingScreen={this.state.isSharingScreen}
+          setDisplayName={this._setDisplayName.bind(this)}
         />
       )
     }
