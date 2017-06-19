@@ -284,7 +284,7 @@ export default (ComposedComponent) => {
 
     _onUserProfileChange(id, profileJson) {
       console.log('_onUserProfileChange' + id + ' profileJson ' + profileJson);
-      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_USER_PROFILE_CHANGE, {jid: id, profile: profileJson});
+      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_USER_PROFILE_CHANGE, {jid: id, profile: profileJson.displayName});
     }
 
     _onDominantSpeakerChanged(dominantSpeakerEndpoint) {
