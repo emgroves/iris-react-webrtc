@@ -279,12 +279,12 @@ export default (ComposedComponent) => {
 
     _onParticipantAudioMuted(jid, mute){
       console.log('_onParticipantAudioMuted' + jid + ' muted ' + mute);
-      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_PARTICIPANT_AUDIO_MUTED, {jid:jid, muted:mute});
+      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_PARTICIPANT_AUDIO_MUTED, {jid:jid, muted: mute});
     }
 
-    _onUserProfileChange(id, profileJson){
+    _onUserProfileChange(id, profileJson) {
       console.log('_onUserProfileChange' + id + ' profileJson ' + profileJson);
-      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_USER_PROFILE_CHANGE, profileJson);
+      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_USER_PROFILE_CHANGE, {jid: id, profile: profileJson);
     }
 
     _onDominantSpeakerChanged(dominantSpeakerEndpoint) {
