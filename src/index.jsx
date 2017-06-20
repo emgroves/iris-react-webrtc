@@ -402,7 +402,16 @@ export default (ComposedComponent) => {
       //     video: true
       //     } // contraints required to create the stream (optional)
       // }
-      const constraints = this._createConstraints()
+      let constraints = {}
+      if (this.state.userConfig.resolution === "auto") {
+        constraints = {
+            audio: true,
+            video: true
+            }
+      }
+      else {
+        constraints = this._createConstraints()
+      }
 
       const streamConfig = {
         "streamType": this.state.userConfig.streamType,
