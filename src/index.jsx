@@ -2,9 +2,11 @@ import React from 'react';
 import _ from 'underscore';
 import KeyMirror from 'keymirror'
 import { EventEmitter } from 'events';
+import Resolutions from './resolutions';
 require('iris-js-sdk');
 const request = require('request-promise-native');
 const uuidV1 = require('uuid/v1');
+
 
 export { default as IrisDialer } from './iris-dialer/components/IrisDialer';
 
@@ -362,16 +364,50 @@ export default (ComposedComponent) => {
       console.log(`onEvent: ${JSON.stringify(event)}`);
     }
 
+    _createConstraints() {
+      //fill the constraints.video part
+      let constraints = {};
+      if (this.state.userConfig.streamType == "video") {
+        constraints.video = {mandatory: {}, optional: [] };
+        constraints.video.optional.push({googLeakyBucket: true });
+        const width = Resolutions[this.state.userConfig.resolution].width;
+        const height = Resolutions[this.state.userConfig.resolution].height;
+        constraints.video.mandatory.minWidth = width ;
+        constraints.video.mandatory.minHeight = height;
+      }
+      else if (this.state.userConfig.streamType == "audio") {
+        constraints.video = false;
+      }
+
+      //fill the audio part
+      constraints.audio = {mandatory: {}, optional: [] };
+      constraints.audio.optional.push({ googEchoCancellation: true },
+        { googAutoGainControl: true },
+        { googNoiseSupression: true },
+        { googHighpassFilter: true },
+        { googNoisesuppression2: true },
+        { googEchoCancellation2: true },
+        { googAutoGainControl2: true });
+
+      return constraints
+    }
+
     _onConnected() {
       console.log('_onConnected');
+      // const streamConfig = {
+      //   "streamType": this.state.userConfig.streamType,
+      //   "resolution": this.state.userConfig.resolution,
+      //   "constraints": {
+      //     audio: true,
+      //     video: true
+      //     } // contraints required to create the stream (optional)
+      // }
+      const constraints = this._createConstraints()
 
       const streamConfig = {
         "streamType": this.state.userConfig.streamType,
         "resolution": this.state.userConfig.resolution,
-        "constraints": {
-          audio: true,
-          video: true
-          } // contraints required to create the stream (optional)
+        "constraints": constraints
       }
 
       this.state.irisRtcStream.createStream(streamConfig);
