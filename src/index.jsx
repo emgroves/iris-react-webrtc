@@ -132,9 +132,12 @@ export default (ComposedComponent) => {
         domain: config.domain,
         token: config.token,
         routingId: config.routingId + '@' + config.domain,
+        toRoutingId: config.toRoutingId,
+        fromTN: config.fromTN,
+        toTN: config.toTN,
         anonymous: config.anonymous ? config.anonymous : false,
         traceId: traceId,
-        callType: 'video',
+        callType: config.callType ? config.callType : 'video',
         loginType: 'connect',
         type: config.type ? config.type : "video",
         streamType:config.streamType ? config.streamType : "video",
@@ -146,22 +149,26 @@ export default (ComposedComponent) => {
         UEStatsServer: '',
         urls : {
           eventManager: config.hosts.eventManagerUrl,
+          notificationServer: config.hosts.notificationServer,
         },
         videoCodec: config.videoCodec ? config.videoCodec : "h264",
         // We get parsing errors from Iris JS SDK if userData isn't stringified
       }
       let userData = "";
       if(config.isPSTN){
-        userData: JSON.stringify({
+        userConfig.cname = config.userName;
+        userConfig.cid = config.userName;
+
+        userData = JSON.stringify({
           "data": {
             "cid": config.userName,
             "cname": config.userName
           }
         })
       }else{
-        userData: JSON.stringify({
+        userData = JSON.stringify({
           "data": {
-            "cid": config.userName,
+            "cid": config.fromTN,
             "cname": config.userName
           },
           "notification": {
@@ -173,6 +180,7 @@ export default (ComposedComponent) => {
       }
 
       userConfig.userData = userData;
+
       let serverConfig = userConfig;
       console.log("init SDK");
       console.log(userConfig);
