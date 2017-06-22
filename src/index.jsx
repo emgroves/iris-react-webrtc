@@ -484,7 +484,7 @@ export default (ComposedComponent) => {
       this.setState({
         remoteConnectionList
       }, () => {
-        this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO);
+        this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, stream);
         // emit event with old and new id's
         let newID = stream.id
         if (oldIDStream && newID) {
