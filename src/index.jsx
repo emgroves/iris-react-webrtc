@@ -149,6 +149,7 @@ export default (ComposedComponent) => {
         UEStatsServer: '',
         urls : {
           eventManager: config.hosts.eventManagerUrl,
+          UEStatsServer: config.hosts.UEStatsServer,
           notificationServer: config.hosts.notificationServer,
         },
         videoCodec: config.videoCodec ? config.videoCodec : "h264",
