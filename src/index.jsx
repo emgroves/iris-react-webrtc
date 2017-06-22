@@ -132,7 +132,7 @@ export default (ComposedComponent) => {
         domain: config.domain,
         token: config.token,
         routingId: config.routingId + '@' + config.domain,
-        toRoutingId: config.toRoutingId,
+        toRoutingId: config.toRoutingId + '@' + config.domain,
         fromTN: config.fromTN,
         toTN: config.toTN,
         anonymous: config.anonymous ? config.anonymous : false,
