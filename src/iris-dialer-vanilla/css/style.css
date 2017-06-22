@@ -1,0 +1,154 @@
+@import url(https://fonts.googleapis.com/css?family=Lato:400,400italic,700);
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+
+
+.button {
+  height: 12em;
+}
+
+.button {
+  height: 1.5em;
+  background-color: orange;
+  border: white 1px solid;
+  font-size: 2em;
+  cursor: default;
+
+  /*prevent text hightlighting*/
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.button:active {
+  background-color: red;
+}
+
+textarea:hover,  input:hover, textarea:active, input:active, textarea:focus,
+button:focus, button:active, button:hover, label:focus, .btn:active,
+.btn.active {
+    outline:0px !important;
+    -webkit-appearance:none;
+}
+
+.dropdown-menu li a {
+  padding: 3px 10px;
+}
+
+.dig {
+  width: 49px;
+  height: 49px;
+  text-align: center;
+  padding: 5px 0;
+  margin-right: 20px;
+  font-size: 20px;
+  line-height: 2.00;
+  border-radius: 30px;
+}
+
+.controls, .keys {
+  padding-top: 10px;
+}
+
+.controls {
+  float: left;
+}
+
+.controls .btn {
+  display: block;
+  margin-bottom: 20px;
+}
+
+.dial-pad {
+  margin-top: 20px;
+  padding-left: 20px;
+  float: center;
+  text-align: center;
+  color: #fff;
+}
+
+.digits-row {
+
+  margin-bottom: 20px;
+}
+
+.digits-row .btn {
+  font-weight: 100;
+}
+
+.digits-row .btn span {
+  display: block;
+  padding-top: 2px;
+  font-size: 10px;
+  color: #787878;
+}
+
+.log {
+  background-color: #ddd;
+  clear: both;
+  padding: 20px 10px;
+  text-align: center;
+  font-size: 12px;
+  color: #787878;
+}
+
+p {
+  font-size: 10px;
+  color: #787878;
+  font-style: italic;
+  margin-top: 10px;
+}
+
+#dialer {
+  font-family: Helvetica, sans-serif;
+  margin: 20px auto;
+  padding: 0;
+  width: 240px;
+  text-align: center;
+}
+
+.phoneNumber{
+  margin-top: 20px;
+  padding-left: 20px;
+  float: center;
+  text-align: center;
+  color: #fff;
+}
+
+.num{
+	font-size:150%
+
+}
+
+.sup{
+		/*color:#c1c1c1,*/
+		font-size:50%
+
+}

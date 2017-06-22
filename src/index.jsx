@@ -8,7 +8,7 @@ const request = require('request-promise-native');
 const uuidV1 = require('uuid/v1');
 
 
-export { default as IrisDialer } from './iris-dialer/components/IrisDialer';
+export { default as IrisDialer } from './iris-dialer-vanilla/components/IrisDialer';
 
 export const WebRTCConstants = KeyMirror({
   WEB_RTC_ON_LOCAL_AUDIO: null,
