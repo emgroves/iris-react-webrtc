@@ -144,6 +144,7 @@ export default (ComposedComponent) => {
         UEStatsServer: '',
         urls : {
           eventManager: config.hosts.eventManagerUrl,
+          UEStatsServer: config.hosts.UEStatsServer
         },
         videoCodec: config.videoCodec ? config.videoCodec : "h264",
         // We get parsing errors from Iris JS SDK if userData isn't stringified
