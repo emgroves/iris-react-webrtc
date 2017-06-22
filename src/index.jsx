@@ -257,11 +257,6 @@ export default (ComposedComponent) => {
       this.state.irisRtcSession.sendChatMessage(uuidV1(), message);
     }
 
-    _setDisplayName(name){
-      console.log('Set display name to '+name);
-      this.state.irisRtcSession.setDisplayName(name);
-    }
-
     _onChatMessage(chatMsgJson) {
       console.log('_onChatMessage' + 'message json ' + chatMsgJson);
       this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_CHAT_MESSAGE_RECEIVED, chatMsgJson);
@@ -280,6 +275,21 @@ export default (ComposedComponent) => {
     _onParticipantAudioMuted(jid, mute){
       console.log('_onParticipantAudioMuted' + jid + ' muted ' + mute);
       this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_PARTICIPANT_AUDIO_MUTED, {jid:jid, muted:mute});
+    }
+
+    _setDisplayName(name){
+      console.log('Set display name to ' + name);
+      this.state.irisRtcSession.setDisplayName(name);
+    }
+
+    _muteParticipantAudio(jid, mute){
+      console.log('Mute participants audio '+ jid + " mute "+ mute);
+      this.state.irisRtcSession.muteParticipantAudio(jid, mute);
+    }
+
+    _muteParticipantVideo(jid, mute){
+      console.log('Mute participants video '+ jid + " mute "+ mute);
+      this.state.irisRtcSession.muteParticipantVideo(jid, mute);
     }
 
     _onUserProfileChange(id, profileJson){
@@ -612,6 +622,8 @@ export default (ComposedComponent) => {
           endScreenshare={this._endScreenshare.bind(this)}
           isSharingScreen={this.state.isSharingScreen}
           setDisplayName={this._setDisplayName.bind(this)}
+          muteParticipantAudio={this._muteParticipantAudio.bind(this)}
+          muteParticipantVideo={this._muteParticipantVideo.bind(this)}
         />
       )
     }
