@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import './css/style.css'
+import '../css/style.css'
 
 //old input
 // <input type="tel" className="form-control" placeholder="215-286-2328"
