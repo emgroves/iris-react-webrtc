@@ -293,12 +293,17 @@ export default (ComposedComponent) => {
       this.state.irisRtcSession.setDisplayName(name);
     }
 
+    _setDisplayName(name){
+      console.log('Set display name to ' + name);
+      this.state.irisRtcSession.setDisplayName(name);
+    }
+
     _muteParticipantAudio(jid, mute){
       console.log('Mute participants audio '+ jid + " mute "+ mute);
       this.state.irisRtcSession.muteParticipantAudio(jid, mute);
     }
 
-   _muteParticipantVideo(jid, mute){
+    _muteParticipantVideo(jid, mute){
       console.log('Mute participants video '+ jid + " mute "+ mute);
       this.state.irisRtcSession.muteParticipantVideo(jid, mute);
     }
