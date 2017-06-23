@@ -1,0 +1,52 @@
+.dialer-main {
+  text-align: center;
+  display: table;
+  margin: 0 auto;
+}
+.phone-number-inputfield {
+  text-align: center;
+}
+
+.dialer-button {
+  background-color: transparent;
+  margin: 2px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+
+.dialer-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1px;
+  -webkit-border-radius: 1px;
+}
+
+.dialer-button:onactive {
+  background: rgba(98, 112, 111, 0.5)
+}
+.dialer-digit {
+  color: #FFFFFF;
+}
+
+.iris-dialer-app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.iris-dialer-container {
+  background-color: rgba(0,0,0,0.5);
+  padding: 10px;
+
+}
+
+
+.dial-pad {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.digits-row {
+  margin-bottom: 5px;
+}

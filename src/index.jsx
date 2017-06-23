@@ -2,11 +2,13 @@ import React from 'react';
 import _ from 'underscore';
 import KeyMirror from 'keymirror'
 import { EventEmitter } from 'events';
+import Resolutions from './resolutions';
 require('iris-js-sdk');
 const request = require('request-promise-native');
 const uuidV1 = require('uuid/v1');
 
-export { default as IrisDialer } from './iris-dialer/components/IrisDialer';
+
+export { default as IrisDialer } from './iris-dialer-vanilla/components/IrisDialer';
 
 export const WebRTCConstants = KeyMirror({
   WEB_RTC_ON_LOCAL_AUDIO: null,
@@ -130,9 +132,12 @@ export default (ComposedComponent) => {
         domain: config.domain,
         token: config.token,
         routingId: config.routingId + '@' + config.domain,
+        toRoutingId: config.toRoutingId + '@' + config.domain,
+        fromTN: config.fromTN,
+        toTN: config.toTN,
         anonymous: config.anonymous ? config.anonymous : false,
         traceId: traceId,
-        callType: 'video',
+        callType: config.callType ? config.callType : 'video',
         loginType: 'connect',
         type: config.type ? config.type : "video",
         streamType:config.streamType ? config.streamType : "video",
@@ -144,23 +149,27 @@ export default (ComposedComponent) => {
         UEStatsServer: '',
         urls : {
           eventManager: config.hosts.eventManagerUrl,
-          UEStatsServer: config.hosts.UEStatsServer
+          UEStatsServer: config.hosts.UEStatsServer,
+          notificationServer: config.hosts.notificationServer,
         },
         videoCodec: config.videoCodec ? config.videoCodec : "h264",
         // We get parsing errors from Iris JS SDK if userData isn't stringified
       }
       let userData = "";
       if(config.isPSTN){
-        userData: JSON.stringify({
+        userConfig.cname = config.userName;
+        userConfig.cid = config.userName;
+
+        userData = JSON.stringify({
           "data": {
             "cid": config.userName,
             "cname": config.userName
           }
         })
       }else{
-        userData: JSON.stringify({
+        userData = JSON.stringify({
           "data": {
-            "cid": config.userName,
+            "cid": config.fromTN,
             "cname": config.userName
           },
           "notification": {
@@ -172,6 +181,7 @@ export default (ComposedComponent) => {
       }
 
       userConfig.userData = userData;
+
       let serverConfig = userConfig;
       console.log("init SDK");
       console.log(userConfig);
@@ -275,7 +285,12 @@ export default (ComposedComponent) => {
 
     _onParticipantAudioMuted(jid, mute){
       console.log('_onParticipantAudioMuted' + jid + ' muted ' + mute);
-      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_PARTICIPANT_AUDIO_MUTED, {jid:jid, muted:mute});
+      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_PARTICIPANT_AUDIO_MUTED, {jid:jid, muted: mute});
+    }
+
+    _setDisplayName(name){
+      console.log('Set display name to '+name);
+      this.state.irisRtcSession.setDisplayName(name);
     }
 
     _setDisplayName(name){
@@ -293,9 +308,9 @@ export default (ComposedComponent) => {
       this.state.irisRtcSession.muteParticipantVideo(jid, mute);
     }
 
-    _onUserProfileChange(id, profileJson){
+    _onUserProfileChange(id, profileJson) {
       console.log('_onUserProfileChange' + id + ' profileJson ' + profileJson);
-      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_USER_PROFILE_CHANGE, profileJson);
+      this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_USER_PROFILE_CHANGE, {jid: id, name: profileJson.displayName});
     }
 
     _onDominantSpeakerChanged(dominantSpeakerEndpoint) {
@@ -373,16 +388,59 @@ export default (ComposedComponent) => {
       console.log(`onEvent: ${JSON.stringify(event)}`);
     }
 
+    _createConstraints() {
+      //fill the constraints.video part
+      let constraints = {};
+      if (this.state.userConfig.streamType == "video") {
+        constraints.video = {mandatory: {}, optional: [] };
+        constraints.video.optional.push({googLeakyBucket: true });
+        const width = Resolutions[this.state.userConfig.resolution].width;
+        const height = Resolutions[this.state.userConfig.resolution].height;
+        constraints.video.mandatory.minWidth = width ;
+        constraints.video.mandatory.minHeight = height;
+      }
+      else if (this.state.userConfig.streamType == "audio") {
+        constraints.video = false;
+      }
+
+      //fill the audio part
+      constraints.audio = {mandatory: {}, optional: [] };
+      constraints.audio.optional.push({ googEchoCancellation: true },
+        { googAutoGainControl: true },
+        { googNoiseSupression: true },
+        { googHighpassFilter: true },
+        { googNoisesuppression2: true },
+        { googEchoCancellation2: true },
+        { googAutoGainControl2: true });
+
+      return constraints
+    }
+
     _onConnected() {
       console.log('_onConnected');
+      // const streamConfig = {
+      //   "streamType": this.state.userConfig.streamType,
+      //   "resolution": this.state.userConfig.resolution,
+      //   "constraints": {
+      //     audio: true,
+      //     video: true
+      //     } // contraints required to create the stream (optional)
+      // }
+      let constraints = {}
+      if (this.state.userConfig.resolution === "auto") {
+        constraints = {
+            audio: true,
+            video: true
+            }
+      }
+      else {
+        constraints = this._createConstraints()
+      }
 
       const streamConfig = {
         "streamType": this.state.userConfig.streamType,
         "resolution": this.state.userConfig.resolution,
-        "constraints": {
-          audio: true,
-          video: true
-          } // contraints required to create the stream (optional)
+        "constraints": constraints
       }
 
       this.state.irisRtcStream.createStream(streamConfig);
@@ -442,7 +500,7 @@ export default (ComposedComponent) => {
       this.setState({
         remoteConnectionList
       }, () => {
-        this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO);
+        this.eventEmitter.emitWebRTCEvent(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, stream);
         // emit event with old and new id's
         let newID = stream.id
         if (oldIDStream && newID) {
