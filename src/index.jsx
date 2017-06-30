@@ -322,6 +322,7 @@ export default (ComposedComponent) => {
       console.log('_sessionEnd');
       if (this.state.irisRtcSession) {
         this.state.irisRtcSession.endSession();
+        this.state.irisRtcStream.stopMediaStream(this.state.localConnectionList[0]);
         this.setState({ irisRtcStream: null, localConnectionList: [], remoteConnectionList: [] });
       }
     }
