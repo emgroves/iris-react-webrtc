@@ -63,9 +63,12 @@ export let LocalVideo = class LocalVideo extends React.Component {
   }
 
   render() {
-    return <div>
-      <video ref='localVideo' autoPlay muted id={'localVideo1'} src={this.props.video ? URL.createObjectURL(this.props.video) : ''} />
-    </div>
+    let styles = {}
+    if (this.props.width || this.props.height) {
+      styles = { width: this.props.width, height: this.props.height } 
+    }
+
+    return <video ref='localVideo' style={styles} autoPlay muted id={'localVideo1'} src={this.props.video ? URL.createObjectURL(this.props.video) : ''} />
   }
 }
 
@@ -86,9 +89,14 @@ export let RemoteVideo = class RemoteVideo extends React.Component {
   }
 
   render() {
-    return <div>
-      <video ref='remoteVideo' autoPlay id={this.props.video.id} src={this.props.video ? URL.createObjectURL(this.props.video) : ''} />
-    </div>
+
+    let styles = {}
+    if (this.props.width || this.props.height) {
+      styles = { width: this.props.width, height: this.props.height } 
+    }
+
+    return <video ref='remoteVideo' style={styles} autoPlay id={this.props.video.id} src={this.props.video ? URL.createObjectURL(this.props.video) : ''} />
+
   }
 }
 
